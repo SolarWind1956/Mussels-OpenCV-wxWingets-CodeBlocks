@@ -1,5 +1,6 @@
 # Mussels-OpenCV-wxWingets-CodeBlocks
-Исследование поведения мидий в рамках динамического предупреждения загрязнения морских акваторий с использованием библиотек OpenCV и wxWingets в каркасе IDE CoderBlocks.
+Mussel behavior research for dynamic marine pollution monitoring, leveraging OpenCV and wxWidgets within the Code::Blocks IDE.
+
 ##  * Authors:    
   Sergi E. Heckel (Solar_Wind1956@yahoo.com)
            with insightful support from Gemini (AI)
