@@ -81,12 +81,17 @@ class erodeAfterAdaptiveTestFrame : public wxPanel
     wxStaticBitmap      *   m_staticFilteredBitmap = nullptr;
     wxStaticBitmap      *   m_staticTransformeddBitmap = nullptr;
 
-    cv::Mat                 m_cv_original_img;
-    cv::Mat                 m_cv_filtered_img;
-    cv::Mat                 m_cv_transformed_img;
-
-    cv::Mat                 out1_for_display;
-    cv::Mat                 out2_for_display;
+    //
+    cv::Mat                 m_cv_original_img;      //  Оригинальное изображение
+    cv::Mat                 m_cv_filtered_img;      //  Изображение после адаптивной пороговой фильтрации
+    cv::Mat                 m_cv_transformed_img;   //  Изображение после морфологической трансфоормации
+    //  Матрицы для экпериментов
+    cv::Mat                 m_image_for_transform;
+    cv::Mat                 m_mat_for_display;
+    cv::Mat                 m_out1_for_display;
+    cv::Mat                 m_out2_for_display;
+    cv::Mat                 m_gray;
+    cv::Mat                 m_masked_color;
 
     wxImage                 m_wx_img;
 

@@ -603,7 +603,7 @@ void erodeAfterAdaptiveTestFrame::OnGrayOrColorChanged(wxCommandEvent& event) {
 
 // Универсальная функция, которая знает про оба окна
 void erodeAfterAdaptiveTestFrame::UpdateAllViews() {
-    //  Визуализация оригинального и отфильтрованного изображения (выводим оба состояния)
+    //  Визуализация оригинального, отфильтрованного и трансформированного изображений
 
     //  Преобразования для вывода оригинального изображения OpenCV в формате библиотеки wxVidgets
     UpdateDisplay   (   m_wx_img
@@ -614,35 +614,32 @@ void erodeAfterAdaptiveTestFrame::UpdateAllViews() {
                     ,   m_zoom_slider_ctrl->m_zoom
                     );
 
-    // Для каждого выходного изображения делаем так:
-
     // Превращаем из GRAY в RGB (чтобы было 3 канала: R=G=B)
-    cv::cvtColor(m_cv_filtered_img, out1_for_display, cv::COLOR_GRAY2RGB);
+    /*
+        Чтобы можно было вывести результат адаптивного фильтра на экран,
+        мы должны преобразовать его одноканальную черно-белую матрицу (бинарную)
+        в трехканальную полутоновую.
+    */
+    cv::cvtColor(m_cv_filtered_img, m_out1_for_display, cv::COLOR_GRAY2RGB);
 
     UpdateDisplay   (   m_wx_img
-                    ,   out1_for_display
+                    ,   m_out1_for_display
                     ,   m_filteredBitmap
                     ,   m_staticFilteredBitmap
                     ,   m_scrolled_wind_filtered
                     ,   m_zoom_slider_ctrl->m_zoom
                     );
 
-
-    //  Преобразования для вывода отфильтрованного изображения OpenCV в формате библиотеки wxVidgets
-
-    // Превращаем из GRAY в RGB (чтобы было 3 канала: R=G=B)
-
-    cv::Mat mat_for_display;
     // Если адаптив выдал 1 канал (а он всегда выдает 1)
     if (m_cv_transformed_img.channels() == 1) {
         // Дублируем канал серого в R, G и B, чтобы wxImage "понял" картинку
-        cv::cvtColor(m_cv_transformed_img, mat_for_display, cv::COLOR_GRAY2RGB);
+        cv::cvtColor(m_cv_transformed_img, m_mat_for_display, cv::COLOR_GRAY2RGB);
     } else {
-        mat_for_display = m_cv_transformed_img;
+        m_mat_for_display = m_cv_transformed_img;
     }
 
     UpdateDisplay   (   m_wx_img
-                    ,   mat_for_display
+                    ,   m_mat_for_display
                     ,   m_transformedBitmap
                     ,   m_staticTransformeddBitmap
                     ,   m_scrolled_wind_transformed
@@ -660,23 +657,27 @@ void erodeAfterAdaptiveTestFrame::UpdateAllViews() {
 //  -----------------------------------------------------------------------------------------------------
 //  Экосистема OpenCV
 void erodeAfterAdaptiveTestFrame::ApplyMixedTransformation() {
-    // 1. Проверка: загружена ли картинка?
-    if (m_cv_original_img.empty()) return;
-
     #if 0
     MessageBoxW(NULL, L"Работает", L"ApplyMixedTransformation()", MB_OK | MB_ICONINFORMATION);
     #endif
     // Вся "кухня" OpenCV здесь
-    //if (m_cv_original_img.empty()) return;
 
     // 1. Создаем ВРЕМЕННУЮ серую копию, не портя оригинал!
-    cv::Mat gray;
-    if (m_cv_original_img.channels() == 3)
-        cv::cvtColor(m_cv_original_img, gray, cv::COLOR_BGR2GRAY);
-    else
-        gray = m_cv_original_img.clone();
+    /*
+        Почему программа «валится» без предварительного преобразования?
 
-    cv::adaptiveThreshold   (   gray
+        Ответ кроется в жестких требованиях функции cv::adaptiveThreshold.
+
+        Если заглянуть в документацию, там четко сказано:
+        входное изображение должно быть 8-битным одноканальным (CV_8UC1).
+    */
+    #if 1
+    if (m_cv_original_img.channels() == 3)
+        cv::cvtColor(m_cv_original_img, m_gray, cv::COLOR_BGR2GRAY);
+    else
+        m_gray = m_cv_original_img.clone();
+    #endif
+    cv::adaptiveThreshold   (   m_gray
                             ,   m_cv_filtered_img
                             ,   m_maxValue
                             ,   m_adaptiveMethod
@@ -687,24 +688,33 @@ void erodeAfterAdaptiveTestFrame::ApplyMixedTransformation() {
     #if 1
     std::wstring msg = L"\nmean(m_cv_filtered_img)[0]: " + std::to_wstring(cv::mean(m_cv_filtered_img)[0]);
     m_debugInfo->AppendText(msg);
+    msg = L"\nКоличество каналов после адаптивной фильтрации: " + std::to_wstring(m_cv_filtered_img.channels());
+    m_debugInfo->AppendText(msg);
     #endif
 
-   cv::Mat image_for_transform;
-
     if (1 == m_gray_color_idx) { // Выбран режим "Цвет"
-        if (m_cv_filtered_img.channels() == 3) {
-            // ПРЕОБРАЗУЕМ: из 1 канала (серый) в 3 канала (цветной формат)
-            cv::cvtColor(m_cv_filtered_img, image_for_transform, cv::COLOR_GRAY2BGR);
-        } else {
-            image_for_transform = m_cv_filtered_img.clone();
+        if (m_cv_filtered_img.channels() == 1) {
+            // Маска (m_cv_filtered_img) должна быть того же размера, что и оригинал
+            // Операция оставит оригинальные цвета там, где в маске 255, и сделает черным там, где 0
+            cv::bitwise_and(m_cv_original_img, m_cv_original_img, m_image_for_transform, m_cv_filtered_img);
+            /*
+                Адаптив — это всегда про 1 канал и жесткую бинарную маску (даже если она кажется «серой» из-за деталей).
+
+                Маска — это «трафарет».
+
+                С помощью bitwise_and() мы накладываем её на цветной оригинал.
+
+                Морфология — может работать и с маской (для логики),
+                и с цветом (для визуальных эффектов или сегментации).
+
+            */
         }
     } else {
-        // Работаем в честном Грее
-        image_for_transform = m_cv_filtered_img.clone();
+        m_image_for_transform = m_cv_filtered_img;
     }
 
     m_kernel_shape = GetSelectedMorphShape();
-    cv::erode   (   image_for_transform
+    cv::erode   (   m_image_for_transform
                 ,   m_cv_transformed_img
                 ,   cv::getStructuringElement   (   m_kernel_shape
                                                 ,   cv::Size(m_kernel_width, m_kernel_height)
@@ -722,7 +732,6 @@ void erodeAfterAdaptiveTestFrame::ApplyMixedTransformation() {
 
     msg = L"\nthreshold::m_maxValue: " + std::to_wstring(m_maxValue);
     m_debugInfo->AppendText(msg);
-
     #endif
 
 }
@@ -730,15 +739,6 @@ void erodeAfterAdaptiveTestFrame::ApplyMixedTransformation() {
 std::string erodeAfterAdaptiveTestFrame::getSignatureText(){
     std::string signature_text =
 
-    "void cv::threshold("
-    "\n,    cv::InputArray src"
-    "\n,    cv::OutputArray dst"
-    "\n,    double thresh"
-    "\n,    double maxValue"
-    "\n,    int    thresholdType"
-    "\n);"
-    "\n "
-    "\n"
     "void cv::adaptiveThreshold("
     "\n,    cv::InputArray src"
     "\n,    cv::OutputArray dst"
@@ -748,6 +748,16 @@ std::string erodeAfterAdaptiveTestFrame::getSignatureText(){
     "\n,    int    blockSize"
     "\n,    double Offset"
     "\n);"
+    "void cv::erode("
+    "\n     cv::InputArray src"
+    "\n,    cv::OutputArray dst"
+    "\n,    cv::InputArray element"
+    "\n,    cv::Point anchor = cv::Point(-1, -1)"
+    "\n,    int iterations = 1"
+    "\n,    int borderType = cv::BORDER_CONSTANT"
+    "\n,    const v::Scalar& borderValue ="
+    "\n             cv::morphologyDefaultBorderValue()"
+    "\n );"
     ;
 
     return signature_text;
