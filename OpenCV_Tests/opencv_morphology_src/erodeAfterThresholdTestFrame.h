@@ -1,0 +1,155 @@
+#ifndef ERODEAFTERTHRESHOLD_H
+#define ERODEAFTERTHRESHOLD_H
+//  erodeAfterThresholdTestFrame.h
+/*
+ ***************************************************************
+ * Name:      erodeAfterThresholdTestFrame.cpp
+ * Purpose:   Code for Application Class
+ * Author:    Sergej E. Heckel (Solar_Wind1956@yahoo.com)
+ *              with insightful support from Gemini (AI)
+ * 	                "Дорогу осилит идущий, а вдвоем идти спорее"
+ * Created:   2026-04-25
+ * Copyright: Sergej E. Heckel (https://sites.google.com/view/sergej-heckel)
+ * License:
+ *************************************************************
+*/
+#include <iostream>
+using std::cout; using std::endl; using std::cerr;  using std::boolalpha;
+#include <functional>
+#include <windows.h>
+#include <string> // обязательно для to_wstring
+
+#include <wx/wx.h>
+#include <wx/treectrl.h>
+#include <wx/dirctrl.h>
+#include <wx/dir.h>
+#include <wx/splitter.h>
+#include <wx/dnd.h>
+#include <wx/listctrl.h>
+#include <wx/font.h>
+#include <wx/control.h>
+#include <wx/filename.h>
+#include <wx/slider.h>
+#include <wx/spinctrl.h>
+#include <wx/radiobox.h>
+
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+#include "color_output.hpp"
+using namespace color_output;
+
+#include "../auxiliary_src/AuxiliaryFreeFunctions.h"
+
+#include "../control_panel_src/KernelMatrixCtrl.h"
+#include "../control_panel_src/ZoomSliderCtrl.h"
+
+/*
+    --------------------------------------------------------------------------------------------------------------------
+    Класс тестового фрейма для изображений и компонетнов управления
+*/
+class erodeAfterThresholdTestFrame : public wxPanel
+{
+ public :
+    erodeAfterThresholdTestFrame(wxWindow* parent);
+
+    wxPanel             *   m_informPanel;                //  Информация о тестировании
+    wxPanel             *   m_filtering_namePanel;        //  Вид фильтрации
+    wxPanel             *   m_signaturePanel;             //  Сигнатуры фильтров
+    wxPanel             *   m_debugPanel;                 //  Панель для отладочного вывода
+
+    wxStaticText        *   m_filtering_name_text;
+    wxStaticText        *   m_signature_name_text;
+    std::string             m_signature_text;
+
+    wxTextCtrl          *   m_debugInfo;
+
+    wxPanel             *   m_previewPanel;               //  Предварительный просмотр исходного изображения
+    wxScrolledWindow    *   m_scrolled_wind_original;     //  Масштабируемоое исходное изображение
+    wxScrolledWindow    *   m_scrolled_wind_filtered;   //  Масштабируемое отфильтрованное изображения
+    wxScrolledWindow    *   m_scrolled_wind_transformed;   //  Масштабируемое отфильтрованное изображения
+
+    wxBitmap                m_previewBitmap;
+    wxBitmap                m_originalBitmap;
+    wxBitmap                m_filteredBitmap;
+    wxBitmap                m_transformedBitmap;
+
+    wxStaticBitmap      *   m_staticPreviewBitmap = nullptr;
+    wxStaticBitmap      *   m_staticOriginalBitmap = nullptr;
+    wxStaticBitmap      *   m_staticFilteredBitmap = nullptr;
+    wxStaticBitmap      *   m_staticTransformeddBitmap = nullptr;
+
+    cv::Mat                 m_cv_original_img;
+    cv::Mat                 m_cv_filtered_img;
+    cv::Mat                 m_cv_transformed_img;
+
+    cv::Mat                 out1_for_display;
+    cv::Mat                 out2_for_display;
+
+    wxImage                 m_wx_img;
+
+    //  1.
+    ZoomSliderCtrl      *   m_zoom_slider_ctrl;
+    //  2.
+    wxSpinCtrlDouble    *   m_spin_thresh_ctrl;
+    double                  m_thresh                    = 127.0;
+    //  3.
+    wxSpinCtrlDouble    *   m_spin_maxValue_ctrl;
+    double                  m_maxValue                  = 250.0;
+    //  4.
+    wxChoice            *   m_choice_threshold_type_ctrl;
+    int                     m_threshold_type            = cv::THRESH_TRUNC;
+    //  5.
+    KernelMatrixCtrl    *   m_kernel_width_ctrl;
+    int                     m_kernel_width              = 3;
+    KernelMatrixCtrl    *   m_kernel_height_ctrl;
+    int                     m_kernel_height             = 3;
+    //  6.
+    wxRadioBox          *   m_kernel_shape_radiobox_ctrl;
+    int                     m_kernel_shape = cv::MORPH_RECT;
+    //  7.
+    wxSpinCtrl          *   m_iterations_spin_ctrl;
+    int                     m_iterations = 1;
+    //  8.
+    wxChoice            *   m_border_chois_ctrl;
+    int                     m_border_extrapolation      = cv::BORDER_CONSTANT;
+    //  9.
+    //  Флаг переключения типа морфологической трансформации "Полутона" / "Цвет"
+    wxRadioBox          *   m_gray_color_radiobox_ctrl;
+    int                     m_gray_color_idx             = 0;   //  Gray
+
+    void OnResize(wxSizeEvent& event);
+
+    //  1.
+    void OnZoomSliderChanged(wxCommandEvent& event);
+    //  2.
+    void OnThreshChanged(wxSpinDoubleEvent& event);
+    //  3.
+    void OnMaxValueChanged(wxSpinDoubleEvent& event);
+    //  4.
+    void OnThreshold_typeChanged(wxCommandEvent& event);
+    //  5.
+    void OnKernelWidthChanged(wxCommandEvent& event);
+    void OnKernelHeightChanged(wxCommandEvent& event);
+    //  6.
+    void OnKernelShapeChanged(wxCommandEvent& event);
+    //  7.
+    void OnIterationsChanged(wxCommandEvent& event);
+    //  8.
+    void OnBorderExtrapolChanged(wxCommandEvent& event);
+    //  9.
+    void OnGrayOrColorChanged(wxCommandEvent& event);
+
+
+    void UpdateAllViews();
+ private:
+    void            ApplyMixedTransformation();
+    std::string     getSignatureText();
+    wxArrayString   getKernelShape();
+    int             GetSelectedMorphShape();
+    wxArrayString   getGrayOrColor();
+};
+
+#endif // ERODEAFTERTHRESHOLD_H
