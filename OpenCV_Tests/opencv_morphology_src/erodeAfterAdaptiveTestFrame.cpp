@@ -516,8 +516,6 @@ void erodeAfterAdaptiveTestFrame::OnKernelWidthChanged(wxCommandEvent& event) {
     // 4. Обновляем картинки
     UpdateAllViews();
 
-    // 5. Если матрица поменяла размер (например, стала 7x7 вместо 3x3),
-    // заставляем сайзеры пересчитать всё окно
     Layout();
 }
 
@@ -534,8 +532,6 @@ void erodeAfterAdaptiveTestFrame::OnKernelHeightChanged(wxCommandEvent& event) {
     // 4. Обновляем картинки
     UpdateAllViews();
 
-    // 5. Если матрица поменяла размер (например, стала 7x7 вместо 3x3),
-    // заставляем сайзеры пересчитать всё окно
     Layout();
 }
 //  8.
@@ -546,8 +542,6 @@ void erodeAfterAdaptiveTestFrame::OnKernelShapeChanged(wxCommandEvent& event) {
     // 2. Обновляем картинки
     UpdateAllViews();
 
-    // 3. Если матрица поменяла размер (например, стала 7x7 вместо 3x3),
-    // заставляем сайзеры пересчитать всё окно
     Layout();
 }
 //  9.
@@ -561,8 +555,6 @@ void erodeAfterAdaptiveTestFrame::OnIterationsChanged(wxCommandEvent& event) {
     // 4. Обновляем картинки
     UpdateAllViews();
 
-    // 5. Если матрица поменяла размер (например, стала 7x7 вместо 3x3),
-    // заставляем сайзеры пересчитать всё окно
     Layout();
 }
 //  10.
@@ -581,8 +573,6 @@ void erodeAfterAdaptiveTestFrame::OnBorderExtrapolChanged(wxCommandEvent& event)
     // 3. Обновляем картинки
     UpdateAllViews();
 
-    // 4. Если матрица поменяла размер (например, стала 7x7 вместо 3x3),
-    // заставляем сайзеры пересчитать всё окно
     Layout();
 }
 //  11.
@@ -596,8 +586,6 @@ void erodeAfterAdaptiveTestFrame::OnGrayOrColorChanged(wxCommandEvent& event) {
     // 2. Обновляем картинки
     UpdateAllViews();
 
-    // 3. Если матрица поменяла размер (например, стала 7x7 вместо 3x3),
-    // заставляем сайзеры пересчитать всё окно
     Layout();
 }
 
@@ -620,10 +608,10 @@ void erodeAfterAdaptiveTestFrame::UpdateAllViews() {
         мы должны преобразовать его одноканальную черно-белую матрицу (бинарную)
         в трехканальную полутоновую.
     */
-    cv::cvtColor(m_cv_filtered_img, m_out1_for_display, cv::COLOR_GRAY2RGB);
+    cv::cvtColor(m_cv_filtered_img, m_binary_filtered_img, cv::COLOR_GRAY2RGB);
 
     UpdateDisplay   (   m_wx_img
-                    ,   m_out1_for_display
+                    ,   m_binary_filtered_img
                     ,   m_filteredBitmap
                     ,   m_staticFilteredBitmap
                     ,   m_scrolled_wind_filtered
@@ -633,13 +621,13 @@ void erodeAfterAdaptiveTestFrame::UpdateAllViews() {
     // Если адаптив выдал 1 канал (а он всегда выдает 1)
     if (m_cv_transformed_img.channels() == 1) {
         // Дублируем канал серого в R, G и B, чтобы wxImage "понял" картинку
-        cv::cvtColor(m_cv_transformed_img, m_mat_for_display, cv::COLOR_GRAY2RGB);
+        cv::cvtColor(m_cv_transformed_img, m_transformed_img_for_display, cv::COLOR_GRAY2RGB);
     } else {
-        m_mat_for_display = m_cv_transformed_img;
+        m_transformed_img_for_display = m_cv_transformed_img;
     }
 
     UpdateDisplay   (   m_wx_img
-                    ,   m_mat_for_display
+                    ,   m_transformed_img_for_display
                     ,   m_transformedBitmap
                     ,   m_staticTransformeddBitmap
                     ,   m_scrolled_wind_transformed
@@ -673,11 +661,11 @@ void erodeAfterAdaptiveTestFrame::ApplyMixedTransformation() {
     */
     #if 1
     if (m_cv_original_img.channels() == 3)
-        cv::cvtColor(m_cv_original_img, m_gray, cv::COLOR_BGR2GRAY);
+        cv::cvtColor(m_cv_original_img, m_gray_original_img, cv::COLOR_BGR2GRAY);
     else
-        m_gray = m_cv_original_img.clone();
+        m_gray_original_img = m_cv_original_img.clone();
     #endif
-    cv::adaptiveThreshold   (   m_gray
+    cv::adaptiveThreshold   (   m_gray_original_img
                             ,   m_cv_filtered_img
                             ,   m_maxValue
                             ,   m_adaptiveMethod
