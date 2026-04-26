@@ -86,6 +86,7 @@ class erodeAfterAdaptiveTestFrame : public wxPanel
     cv::Mat                 m_cv_filtered_img;      //  Изображение после адаптивной пороговой фильтрации
     cv::Mat                 m_cv_transformed_img;   //  Изображение после морфологической трансфоормации
 
+    cv::Mat                 m_filtered_img_for_display;
     cv::Mat                 m_image_for_transform;
     cv::Mat                 m_transformed_img_for_display;
     cv::Mat                 m_binary_filtered_img;

@@ -594,6 +594,8 @@ void erodeAfterAdaptiveTestFrame::UpdateAllViews() {
     //  Визуализация оригинального, отфильтрованного и трансформированного изображений
 
     //  Преобразования для вывода оригинального изображения OpenCV в формате библиотеки wxVidgets
+    //  ---------------------------------------------------------------------------------------------------------
+    //  Вывод оригинального изображения - оно может быть и трехканальным и одноканалным, лишь бы не бинарным
     UpdateDisplay   (   m_wx_img
                     ,   m_cv_original_img
                     ,   m_originalBitmap
@@ -602,16 +604,24 @@ void erodeAfterAdaptiveTestFrame::UpdateAllViews() {
                     ,   m_zoom_slider_ctrl->m_zoom
                     );
 
-    // Превращаем из GRAY в RGB (чтобы было 3 канала: R=G=B)
+    //  ---------------------------------------------------------------------------------------------------------
+    //  Вывод изображения после адаптивной фильтрации - оно бинарное по определению
+    //  Для возможности вывода его на экран ревращаем из GRAY в RGB (чтобы было 3 канала: R=G=B)
     /*
         Чтобы можно было вывести результат адаптивного фильтра на экран,
         мы должны преобразовать его одноканальную черно-белую матрицу (бинарную)
         в трехканальную полутоновую.
     */
-    cv::cvtColor(m_cv_filtered_img, m_binary_filtered_img, cv::COLOR_GRAY2RGB);
+    // Если адаптив выдал 1 канал (а он всегда выдает 1)
+    if (m_cv_filtered_img.channels() == 1) {
+        // Дублируем канал серого в R, G и B, чтобы wxImage "понял" картинку
+        cv::cvtColor(m_cv_filtered_img, m_filtered_img_for_display, cv::COLOR_GRAY2RGB);
+    } else {
+        m_filtered_img_for_display = m_cv_transformed_img.clone();
+    }
 
     UpdateDisplay   (   m_wx_img
-                    ,   m_binary_filtered_img
+                    ,   m_filtered_img_for_display
                     ,   m_filteredBitmap
                     ,   m_staticFilteredBitmap
                     ,   m_scrolled_wind_filtered
@@ -623,7 +633,7 @@ void erodeAfterAdaptiveTestFrame::UpdateAllViews() {
         // Дублируем канал серого в R, G и B, чтобы wxImage "понял" картинку
         cv::cvtColor(m_cv_transformed_img, m_transformed_img_for_display, cv::COLOR_GRAY2RGB);
     } else {
-        m_transformed_img_for_display = m_cv_transformed_img;
+        m_transformed_img_for_display = m_cv_transformed_img.clone();
     }
 
     UpdateDisplay   (   m_wx_img
@@ -650,6 +660,8 @@ void erodeAfterAdaptiveTestFrame::ApplyMixedTransformation() {
     #endif
     // Вся "кухня" OpenCV здесь
 
+    //  ---------------------------------------------------------------------------------------------------------
+    //  Преобразование адаптивное пороговое
     // 1. Создаем ВРЕМЕННУЮ серую копию, не портя оригинал!
     /*
         Почему программа «валится» без предварительного преобразования?
@@ -658,13 +670,14 @@ void erodeAfterAdaptiveTestFrame::ApplyMixedTransformation() {
 
         Если заглянуть в документацию, там четко сказано:
         входное изображение должно быть 8-битным одноканальным (CV_8UC1).
+
+        А если оно трехканальное, нужно преобразовать его в бинарное
     */
-    #if 1
     if (m_cv_original_img.channels() == 3)
         cv::cvtColor(m_cv_original_img, m_gray_original_img, cv::COLOR_BGR2GRAY);
     else
         m_gray_original_img = m_cv_original_img.clone();
-    #endif
+
     cv::adaptiveThreshold   (   m_gray_original_img
                             ,   m_cv_filtered_img
                             ,   m_maxValue
@@ -680,7 +693,9 @@ void erodeAfterAdaptiveTestFrame::ApplyMixedTransformation() {
     m_debugInfo->AppendText(msg);
     #endif
 
-    if (1 == m_gray_color_idx) { // Выбран режим "Цвет"
+    //  --------------------------------------------------------------------------------------------------------------
+    //  Морфологическое преобразование `erode`
+    if (1 == m_gray_color_idx) { // Если выбран режим "Цвет"
         if (m_cv_filtered_img.channels() == 1) {
             // Маска (m_cv_filtered_img) должна быть того же размера, что и оригинал
             // Операция оставит оригинальные цвета там, где в маске 255, и сделает черным там, где 0
@@ -698,7 +713,7 @@ void erodeAfterAdaptiveTestFrame::ApplyMixedTransformation() {
             */
         }
     } else {
-        m_image_for_transform = m_cv_filtered_img;
+        m_image_for_transform = m_cv_filtered_img.clone();
     }
 
     m_kernel_shape = GetSelectedMorphShape();
