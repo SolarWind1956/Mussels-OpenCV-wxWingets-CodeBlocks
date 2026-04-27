@@ -113,7 +113,8 @@ resizeTestFrame::resizeTestFrame  ( wxWindow  *   parent)
     //  ------------------------------------------------------------------------------------------------------
     //  Подготовка панели управления отображением изображений
     //  1.
-    m_zoom_slider_ctrl      =   new ZoomSliderCtrl(this);
+    m_zoom_orig_slider_ctrl      =   new ZoomSliderCtrl(this);
+    m_zoom_resz_slider_ctrl      =   new ZoomSliderCtrl(this, 10);
 
     //  2.  Новое значение для ширины изображеия
     m_spin_newWidth_ctrl    =   new wxSpinCtrl          (   this
@@ -192,10 +193,14 @@ resizeTestFrame::resizeTestFrame  ( wxWindow  *   parent)
     wxBoxSizer*         controlPanelHSizer   = new wxBoxSizer(wxHORIZONTAL);
     controlPanelHSizer->SetMinSize(wxSize(-1, 150)); // -1 значит "любая ширина", 150 - фиксированная высота
 
-    // 1. Слайдер масштаба в отдельном столбике
-    wxBoxSizer*         zoomCol             = new wxBoxSizer(wxVERTICAL);
-    zoomCol->Add(new wxStaticText(this, -1, "Масштаб"), 0, wxALL, 5);
-    zoomCol->Add(m_zoom_slider_ctrl, 0, wxEXPAND | wxALL, 5);
+    // 1. СлайдерЫ масштаба в отдельных столбиках
+    wxBoxSizer*         zoomOrigCol             = new wxBoxSizer(wxVERTICAL);
+    zoomOrigCol->Add(new wxStaticText(this, -1, "Масштаб оригинала"), 0, wxALL, 5);
+    zoomOrigCol->Add(m_zoom_orig_slider_ctrl, 0, wxEXPAND | wxALL, 5);
+
+    wxBoxSizer*         zoomReszCol             = new wxBoxSizer(wxVERTICAL);
+    zoomReszCol->Add(new wxStaticText(this, -1, "Масштаб изменения"), 0, wxALL, 5);
+    zoomReszCol->Add(m_zoom_resz_slider_ctrl, 0, wxEXPAND | wxALL, 5);
 
     //  2.  Новое значение для ширины изображеия
     wxBoxSizer*         newWidth_Col       = new wxBoxSizer(wxVERTICAL);
@@ -225,7 +230,8 @@ resizeTestFrame::resizeTestFrame  ( wxWindow  *   parent)
     //  -------------------------------------------------------------------------------------------------
     //  Объединяем элементы управления в один горизонтальный сайзер
     //  1.
-    controlPanelHSizer->Add(zoomCol, 0, wxEXPAND | wxALL, 5);
+    controlPanelHSizer->Add(zoomOrigCol, 0, wxEXPAND | wxALL, 5);
+    controlPanelHSizer->Add(zoomReszCol, 0, wxEXPAND | wxALL, 5);
     //  2.
     controlPanelHSizer->Add(newWidth_Col, 0, wxEXPAND | wxALL, 5);
     //  3.
@@ -251,7 +257,8 @@ resizeTestFrame::resizeTestFrame  ( wxWindow  *   parent)
     //  Привязка обработчиков событий
     //  В конструкторе теперь только "регистрация"
     //  1.
-    m_zoom_slider_ctrl->Bind(wxEVT_SLIDER, &resizeTestFrame::OnZoomSliderChanged, this);
+    m_zoom_orig_slider_ctrl->Bind(wxEVT_SLIDER, &resizeTestFrame::OnZoomOrigSliderChanged, this);
+    m_zoom_resz_slider_ctrl->Bind(wxEVT_SLIDER, &resizeTestFrame::OnZoomReszSliderChanged, this);
     //  2.
     m_spin_newWidth_ctrl->Bind(wxEVT_SPINCTRL, &resizeTestFrame::OnNewWidthChanged, this);
     //  3.
@@ -296,9 +303,17 @@ void resizeTestFrame::OnResize(wxSizeEvent& event)
     event.Skip();
 }
 //  1.
-void resizeTestFrame::OnZoomSliderChanged(wxCommandEvent& event) {
+void resizeTestFrame::OnZoomOrigSliderChanged(wxCommandEvent& event) {
     // 1. Извлекаем масшаб
-    m_zoom_slider_ctrl->m_zoom = event.GetInt();
+    m_zoom_orig_slider_ctrl->m_zoom = event.GetInt();
+    // 2. Запускаем обработку OpenCV
+    UpdateAllViews();
+
+    Layout();
+}
+void resizeTestFrame::OnZoomReszSliderChanged(wxCommandEvent& event) {
+    // 1. Извлекаем масшаб
+    m_zoom_resz_slider_ctrl->m_zoom = event.GetInt();
     // 2. Запускаем обработку OpenCV
     UpdateAllViews();
 
@@ -406,7 +421,7 @@ void resizeTestFrame::UpdateAllViews() {
                     ,   m_originalBitmap
                     ,   m_staticOriginalBitmap
                     ,   m_scrolled_wind_original
-                    ,   m_zoom_slider_ctrl->m_zoom
+                    ,   m_zoom_orig_slider_ctrl->m_zoom
                     );
 
     //  ---------------------------------------------------------------------------------------------------------
@@ -415,7 +430,7 @@ void resizeTestFrame::UpdateAllViews() {
                     ,   m_resizedBitmap
                     ,   m_staticResizedBitmap
                     ,   m_scrolled_wind_resized
-                    ,   m_zoom_slider_ctrl->m_zoom
+                    ,   m_zoom_resz_slider_ctrl->m_zoom
                     );
 
     //  Внутри панели создаем битмэп и статический битмап для вывода предварительного оригинального изображения

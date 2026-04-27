@@ -87,7 +87,8 @@ class resizeTestFrame : public wxPanel
     wxImage                 m_wx_img;
 
     //  1.
-    ZoomSliderCtrl      *   m_zoom_slider_ctrl;
+    ZoomSliderCtrl      *   m_zoom_orig_slider_ctrl;
+    ZoomSliderCtrl      *   m_zoom_resz_slider_ctrl;
 
     //  2.  Новое значение для ширины изображеия
     wxSpinCtrl          *   m_spin_newWidth_ctrl;
@@ -113,7 +114,9 @@ class resizeTestFrame : public wxPanel
     void OnResize(wxSizeEvent& event);
 
     //  1.
-    void OnZoomSliderChanged(wxCommandEvent& event);
+    void OnZoomOrigSliderChanged(wxCommandEvent& event);
+    void OnZoomReszSliderChanged(wxCommandEvent& event);
+
     //  2.
     void OnNewWidthChanged(wxSpinEvent& event);
     //  3.
