@@ -1,13 +1,13 @@
 //  ZoomSliderCtrl.cpp
 /*
  ***************************************************************
- * Name:      ZoomSliderCtrl.cpp
+ * Name:      OpenCV_Tester.cpp
  * Purpose:   Code for Application Class
- * Author:    Sergi E. Heckel (Solar_Wind1956@yahoo.com)
+ * Author:    Sergej E. Heckel (Solar_Wind1956@yahoo.com)
  *              with insightful support from Gemini (AI)
  * 	                "Дорогу осилит идущий, а вдвоем идти спорее"
  * Created:   2026-04-21
- * Copyright: Sergi E. Heckel (www.Solar_Wind1956.com)
+ * Copyright: Sergi E. Heckel (https://sites.google.com/view/sergej-heckel)
  * License:
  *************************************************************
 */
@@ -16,16 +16,17 @@
 /*
     Класс компонента выбора масштаба отображения изображений
 */
-ZoomSliderCtrl::ZoomSliderCtrl(wxWindow *   parent)
+ZoomSliderCtrl::ZoomSliderCtrl(wxWindow *   parent, int max_zoom)
                : wxControl              (   parent
                                         ,   wxID_ANY
-                                        )
+                                        ),
+                 m_max_zoom             (max_zoom)
 {
     zoom_slider  =   new     wxSlider   (   this
                                         ,   wxID_ANY
                                         ,   1                       //  Начальное значение
                                         ,   1                       //  Минимальное значение
-                                        ,   5                       //  Максимальное значение
+                                        ,   m_max_zoom              //  Максимальное значение
                                         ,   wxPoint(10, 10)
                                         ,   wxSize(100, -1)         //  горизонтальный слайдер
                                         ,   wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS
