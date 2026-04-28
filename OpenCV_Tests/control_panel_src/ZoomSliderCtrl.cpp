@@ -44,6 +44,6 @@ ZoomSliderCtrl::ZoomSliderCtrl(wxWindow *   parent, int max_zoom)
 */
 void ZoomSliderCtrl::OnScroll(wxCommandEvent& event)
 {
-    m_zoom    =   zoom_slider->GetValue();
+    m_zoom    =   event.GetInt();//zoom_slider->GetValue();
     Refresh();
 }

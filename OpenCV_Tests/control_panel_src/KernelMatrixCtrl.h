@@ -1,4 +1,16 @@
 //  KernelMatrixCtrl.h
+/*
+ **************************************************************
+ * Name:      OpenCV_Tester.cpp
+ * Purpose:   Code for Application Class
+ * Author:    Sergej E. Heckel (Solar_Wind1956@yahoo.com)
+ *              with insightful support from Gemini (AI)
+ * 	                "Дорогу осилит идущий, а вдвоем идти спорее"
+ * Created:   2026-04-21
+ * Copyright: Sergej E. Heckel (https://sites.google.com/view/sergej-heckel)
+ * License:
+ **************************************************************
+*/
 #ifndef KERNELMATRIXCTRL_H
 #define KERNELMATRIXCTRL_H
 /*

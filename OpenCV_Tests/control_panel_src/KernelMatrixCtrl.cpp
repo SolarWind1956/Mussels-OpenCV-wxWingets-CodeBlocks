@@ -1,13 +1,13 @@
 //  KernelMatrixCtrl.cpp
 /*
  ***************************************************************
- * Name:      KernelMatrixCtrl.cpp
+ * Name:      OpenCV_Tester.cpp
  * Purpose:   Code for Application Class
- * Author:    Sergi E. Heckel (Solar_Wind1956@yahoo.com)
+ * Author:    Sergej E. Heckel (Solar_Wind1956@yahoo.com)
  *              with insightful support from Gemini (AI)
  * 	                "Дорогу осилит идущий, а вдвоем идти спорее"
  * Created:   2026-04-21
- * Copyright: Sergi E. Heckel (www.Solar_Wind1956.com)
+ * Copyright: Sergi E. Heckel (https://sites.google.com/view/sergej-heckel)
  * License:
  *************************************************************
 */
