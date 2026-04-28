@@ -8,7 +8,7 @@
  * Author:    Sergej E. Heckel (Solar_Wind1956@yahoo.com)
  *              with insightful support from Gemini (AI)
  * 	                "Дорогу осилит идущий, а вдвоем идти спорее"
- * Created:   2026-04-21
+ * Created:   2026-04-23
  * Copyright: Sergej E. Heckel (https://sites.google.com/view/sergej-heckel)
  * License:
  *************************************************************
@@ -50,10 +50,10 @@ using namespace color_output;
     --------------------------------------------------------------------------------------------------------------------
     Класс тестового фрейма для изображений и компонетнов управления
 */
-class dilateTestFrame : public wxPanel
+class dilateTestFrame : public wxFrame
 {
  public :
-    dilateTestFrame(wxWindow* parent);
+    dilateTestFrame(wxWindow* parent, const wxString& title);
 
     wxPanel          *  m_informPanel;                //  Панель для вывода информации о тестировании
     wxPanel          *  m_transform_namePanel;        //  Панель для вывода информации о тестировании
@@ -72,8 +72,8 @@ class dilateTestFrame : public wxPanel
     wxBitmap            m_filteredBitmap;
 
     wxStaticBitmap *    m_staticPreviewBitmap = nullptr;
-    wxStaticBitmap *    m_staticOriginalBitmap;
-    wxStaticBitmap *    m_staticFilteredBitmap;
+    wxStaticBitmap *    m_staticOriginalBitmap = nullptr;
+    wxStaticBitmap *    m_staticFilteredBitmap = nullptr;
 
 
     cv::Mat             m_cv_original_img;

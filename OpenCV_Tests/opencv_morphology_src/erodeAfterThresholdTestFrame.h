@@ -50,10 +50,10 @@ using namespace color_output;
     --------------------------------------------------------------------------------------------------------------------
     Класс тестового фрейма для изображений и компонетнов управления
 */
-class erodeAfterThresholdTestFrame : public wxPanel
+class erodeAfterThresholdTestFrame : public wxFrame
 {
  public :
-    erodeAfterThresholdTestFrame(wxWindow* parent);
+    erodeAfterThresholdTestFrame(wxWindow* parent, const wxString& title);
 
     wxPanel             *   m_informPanel;                //  Информация о тестировании
     wxPanel             *   m_filtering_namePanel;        //  Вид фильтрации
@@ -66,10 +66,10 @@ class erodeAfterThresholdTestFrame : public wxPanel
 
     wxTextCtrl          *   m_debugInfo;
 
-    wxPanel             *   m_previewPanel;               //  Предварительный просмотр исходного изображения
-    wxScrolledWindow    *   m_scrolled_wind_original;     //  Масштабируемоое исходное изображение
-    wxScrolledWindow    *   m_scrolled_wind_filtered;   //  Масштабируемое отфильтрованное изображения
-    wxScrolledWindow    *   m_scrolled_wind_transformed;   //  Масштабируемое отфильтрованное изображения
+    wxPanel             *   m_previewPanel;                 //  Предварительный просмотр исходного изображения
+    wxScrolledWindow    *   m_scrolled_wind_original;       //  Масштабируемоое исходное изображение
+    wxScrolledWindow    *   m_scrolled_wind_filtered;       //  Масштабируемое отфильтрованное изображения
+    wxScrolledWindow    *   m_scrolled_wind_transformed;    //  Масштабируемое трансформированное изображения
 
     wxBitmap                m_previewBitmap;
     wxBitmap                m_originalBitmap;
@@ -79,14 +79,16 @@ class erodeAfterThresholdTestFrame : public wxPanel
     wxStaticBitmap      *   m_staticPreviewBitmap = nullptr;
     wxStaticBitmap      *   m_staticOriginalBitmap = nullptr;
     wxStaticBitmap      *   m_staticFilteredBitmap = nullptr;
-    wxStaticBitmap      *   m_staticTransformeddBitmap = nullptr;
+    wxStaticBitmap      *   m_staticTransformedBitmap = nullptr;
 
     cv::Mat                 m_cv_original_img;
     cv::Mat                 m_cv_filtered_img;
     cv::Mat                 m_cv_transformed_img;
 
-    cv::Mat                 out1_for_display;
-    cv::Mat                 out2_for_display;
+    cv::Mat                 m_transformed_img_for_display;
+    cv::Mat                 m_filtered_img_for_display;
+    cv::Mat                 m_gray_original_img;
+    cv::Mat                 m_image_for_transform;
 
     wxImage                 m_wx_img;
 
@@ -108,17 +110,16 @@ class erodeAfterThresholdTestFrame : public wxPanel
     int                     m_kernel_height             = 3;
     //  6.
     wxRadioBox          *   m_kernel_shape_radiobox_ctrl;
-    int                     m_kernel_shape = cv::MORPH_RECT;
+    int                     m_kernel_shape              = cv::MORPH_RECT;
     //  7.
     wxSpinCtrl          *   m_iterations_spin_ctrl;
-    int                     m_iterations = 1;
+    int                     m_iterations                = 1;
     //  8.
     wxChoice            *   m_border_chois_ctrl;
     int                     m_border_extrapolation      = cv::BORDER_CONSTANT;
-    //  9.
-    //  Флаг переключения типа морфологической трансформации "Полутона" / "Цвет"
+    //  9.  Флаг переключения типа морфологической трансформации "Полутона" / "Цвет"
     wxRadioBox          *   m_gray_color_radiobox_ctrl;
-    int                     m_gray_color_idx             = 0;   //  Gray
+    int                     m_gray_color_idx            = 0;   //  Gray
 
     void OnResize(wxSizeEvent& event);
 
@@ -142,9 +143,8 @@ class erodeAfterThresholdTestFrame : public wxPanel
     //  9.
     void OnGrayOrColorChanged(wxCommandEvent& event);
 
-
-    void UpdateAllViews();
  private:
+    void            UpdateAllViews();
     void            ApplyMixedTransformation();
     std::string     getSignatureText();
     wxArrayString   getKernelShape();

@@ -50,10 +50,10 @@ using namespace color_output;
     --------------------------------------------------------------------------------------------------------------------
     Класс тестового фрейма для изображений и компонетнов управления
 */
-class erodeTestFrame : public wxPanel
+class erodeTestFrame : public wxFrame
 {
  public :
-    erodeTestFrame(wxWindow* parent);
+    erodeTestFrame(wxWindow* parent, const wxString& title);
 
     wxPanel          *  m_informPanel;                //  Панель для вывода информации о тестировании
     wxPanel          *  m_transform_namePanel;        //  Панель для вывода информации о тестировании
@@ -72,8 +72,8 @@ class erodeTestFrame : public wxPanel
     wxBitmap            m_filteredBitmap;
 
     wxStaticBitmap *    m_staticPreviewBitmap = nullptr;
-    wxStaticBitmap *    m_staticOriginalBitmap;
-    wxStaticBitmap *    m_staticFilteredBitmap;
+    wxStaticBitmap *    m_staticOriginalBitmap = nullptr;
+    wxStaticBitmap *    m_staticFilteredBitmap = nullptr;
 
 
     cv::Mat             m_cv_original_img;

@@ -25,10 +25,13 @@
     V.     	Фильтрация изображения OpenCV
     VI.		Прорисовка изображений OpenCV в формате библиотеки wxVidgets
 */
-erodeAfterAdaptiveTestFrame::erodeAfterAdaptiveTestFrame  ( wxWindow  *   parent)
-                                                : wxPanel   (   parent          //  Инициализируем как панель
-                                                            ,   wxID_ANY
-                                                            )
+erodeAfterAdaptiveTestFrame::erodeAfterAdaptiveTestFrame  ( wxWindow  *   parent, const wxString& title)
+                        : wxFrame   (   parent
+                                    ,   wxID_ANY
+                                    ,   title
+                                    ,   wxDefaultPosition
+                                    ,   wxSize(800, 600)
+                                    )
 {
     //  I.  ------------------------------------------------------------------------------------------------
     //  Создадим информационную панель,
@@ -78,41 +81,7 @@ erodeAfterAdaptiveTestFrame::erodeAfterAdaptiveTestFrame  ( wxWindow  *   parent
     m_scrolled_wind_filtered        =   new wxScrolledWindow(this);
     m_scrolled_wind_transformed     =   new wxScrolledWindow(this);
 
-    //  II.    --------------------------------------------------------------------------------------------
-    //  Сайзеры
-    //  ----------------------------------------------------------------------------------------------------
-    //  II.1. Сайзеры для отображения различной вспомогательной инофрмации о тестировании
-    //  Добавляем в сайзер: (объект, пропорция, флаги, отступ)
-    wxBoxSizer *            informHSizer       =   new wxBoxSizer(wxHORIZONTAL);
-    informHSizer->SetMinSize(wxSize(-1, -1)); // -1 значит "любая ширина", -1 значит "любая высота"
-
-    informHSizer->Add(m_filtering_namePanel, 1, wxCENTER | wxALL, 5);
-    informHSizer->Add(m_signaturePanel, 1, wxCENTER | wxALL, 5);
-    informHSizer->Add(m_debugPanel, 1, wxCENTER | wxALL, 5);
-
-    m_informPanel->SetSizer(informHSizer);
-
-
-    //  ----------------------------------------------------------------------------------------------------
-    //  II.2. Сайзеры для отображения различных вариантов исследуемого изображения
-    //  Используем сайзер, чтобы центрировать превью внутри панели
-    wxBoxSizer *            previewSizer    =   new wxBoxSizer(wxVERTICAL);
-    previewSizer->Add(m_staticPreviewBitmap, 1, wxCENTER | wxALL, 5);
-    m_previewPanel->SetSizer(previewSizer);
-
-    wxBoxSizer *            titelSizerHor       =   new wxBoxSizer(wxHORIZONTAL);
-    wxString titelStr = wxString::Format("%-150s %-150s %-150s %-150s",
-    "Превью", "Оригинальное", "После adaptiveThredshold фильтра", "После Erode трансформации");
-    titelSizerHor->Add(new wxStaticText(this, -1, titelStr), 0, wxALL, 5);
-
-    wxBoxSizer *            imagesHSizer       =   new wxBoxSizer(wxHORIZONTAL);
-    //  Добавляем в главный сайзер превью-панель
-    imagesHSizer->Add(m_previewPanel, 0, wxEXPAND | wxALL, 5);                  // Фикс
-    imagesHSizer->Add(m_scrolled_wind_original,     1, wxEXPAND | wxALL, 5);    // Растягивается
-    imagesHSizer->Add(m_scrolled_wind_filtered,     1, wxEXPAND | wxALL, 5);    // Растягивается
-    imagesHSizer->Add(m_scrolled_wind_transformed,  1, wxEXPAND | wxALL, 5);    // Растягивается
-
-    //  ------------------------------------------------------------------------------------------------------
+        //  ------------------------------------------------------------------------------------------------------
     //  Подготовка панели управления отображением изображений
     //  1.
     m_zoom_slider_ctrl      =   new ZoomSliderCtrl(this);
@@ -248,6 +217,40 @@ erodeAfterAdaptiveTestFrame::erodeAfterAdaptiveTestFrame  ( wxWindow  *   parent
                                                     ,   wxRA_SPECIFY_COLS
                                                     );
 
+    //  II.    --------------------------------------------------------------------------------------------
+    //  Сайзеры
+    //  ----------------------------------------------------------------------------------------------------
+    //  II.1. Сайзеры для отображения различной вспомогательной инофрмации о тестировании
+    //  Добавляем в сайзер: (объект, пропорция, флаги, отступ)
+    wxBoxSizer *            informHSizer       =   new wxBoxSizer(wxHORIZONTAL);
+    informHSizer->SetMinSize(wxSize(-1, -1)); // -1 значит "любая ширина", -1 значит "любая высота"
+
+    informHSizer->Add(m_filtering_namePanel, 1, wxCENTER | wxALL, 5);
+    informHSizer->Add(m_signaturePanel, 1, wxCENTER | wxALL, 5);
+    informHSizer->Add(m_debugPanel, 1, wxCENTER | wxALL, 5);
+
+    m_informPanel->SetSizer(informHSizer);
+
+
+    //  ----------------------------------------------------------------------------------------------------
+    //  II.2. Сайзеры для отображения различных вариантов исследуемого изображения
+    //  Используем сайзер, чтобы центрировать превью внутри панели
+    wxBoxSizer *            previewSizer    =   new wxBoxSizer(wxVERTICAL);
+    previewSizer->Add(m_staticPreviewBitmap, 1, wxCENTER | wxALL, 5);
+    m_previewPanel->SetSizer(previewSizer);
+
+    wxBoxSizer *            titelSizerHor       =   new wxBoxSizer(wxHORIZONTAL);
+    wxString titelStr = wxString::Format("%-150s %-150s %-150s %-150s",
+    "Превью", "Оригинальное", "После adaptiveThredshold фильтра", "После Erode трансформации");
+    titelSizerHor->Add(new wxStaticText(this, -1, titelStr), 0, wxALL, 5);
+
+    wxBoxSizer *            imagesHSizer       =   new wxBoxSizer(wxHORIZONTAL);
+    //  Добавляем в главный сайзер превью-панель
+    imagesHSizer->Add(m_previewPanel, 0, wxEXPAND | wxALL, 5);                  // Фикс
+    imagesHSizer->Add(m_scrolled_wind_original,     1, wxEXPAND | wxALL, 5);    // Растягивается
+    imagesHSizer->Add(m_scrolled_wind_filtered,     1, wxEXPAND | wxALL, 5);    // Растягивается
+    imagesHSizer->Add(m_scrolled_wind_transformed,  1, wxEXPAND | wxALL, 5);    // Растягивается
+
     //  ----------------------------------------------------------------------------------------------------
     //  II.3. Сайзеры для панели настроек и управления
     wxBoxSizer*         controlPanelHSizer   = new wxBoxSizer(wxHORIZONTAL);
@@ -258,62 +261,52 @@ erodeAfterAdaptiveTestFrame::erodeAfterAdaptiveTestFrame  ( wxWindow  *   parent
     zoomCol->Add(new wxStaticText(this, -1, "Масштаб"), 0, wxALL, 5);
     zoomCol->Add(m_zoom_slider_ctrl, 0, wxEXPAND | wxALL, 5);
 
-    //  Максимальные значения для threshold и для AdaptiveShreshold
-    //  2.
+    //  2.  Максимальные значения для threshold и для AdaptiveShreshold
     wxBoxSizer*         maxValue_Col       = new wxBoxSizer(wxVERTICAL);
     maxValue_Col->Add(new wxStaticText(this, -1, "maxValue Threshold"), 0, wxALL, 5);
     maxValue_Col->Add(m_spin_maxValue_ctrl, 0, wxALL, 5);
 
-    //  3.
-    //  Адаптивный метод для AdaptiveShreshold
+    //  3.  Адаптивный метод для AdaptiveShreshold
     wxBoxSizer*         adaptiveMethodCol       = new wxBoxSizer(wxVERTICAL);
     adaptiveMethodCol->Add(new wxStaticText(this, -1, "Adaptive method"), 0, wxALL, 5);
     adaptiveMethodCol->Add(m_choice_adaptiveMethod_ctrl, 0, wxALL, 5);
 
-    //  4.
-    // Типы операции для AdaptiveShreshold
+    //  4. Типы операции для AdaptiveShreshold
     wxBoxSizer*         adaptiveTypesCol       = new wxBoxSizer(wxVERTICAL);
     adaptiveTypesCol->Add(new wxStaticText(this, -1, "Тип операци Threshold"), 0, wxALL, 5);
     adaptiveTypesCol->Add(m_choice_adaptiveType_ctrl, 0, wxALL, 5);
 
-    //  5.
-    //  Размер блока и константа для AdaptiveShreshold
+    //  5.  Размер блока и константа для AdaptiveShreshold
     wxBoxSizer*         blockSizeCol       = new wxBoxSizer(wxVERTICAL);
     blockSizeCol->Add(new wxStaticText(this, -1, "blockSize Adaptive"), 0, wxALL, 5);
     blockSizeCol->Add(m_spin_blockSize_ctrl, 0, wxALL, 5);
 
-    //  6.
-    //  Смещение
+    //  6.  Смещение
     wxBoxSizer*         OffsetCol       = new wxBoxSizer(wxVERTICAL);
     OffsetCol->Add(new wxStaticText(this, -1, "Смещение Adaptive"), 0, wxALL, 5);
     OffsetCol->Add(m_spin_Offset_ctrl, 0, wxALL, 5);
 
-    //  7.
-    // Матрицы для ширины и высоты ядра
+    //  7. Матрицы для ширины и высоты ядра
     wxBoxSizer*         kernelHor           = new wxBoxSizer(wxHORIZONTAL);
     kernelHor->Add(new wxStaticText(this, -1, " Ширина\n и высота\n неквадратного\n ядра"), 0, wxALL, 5);
     kernelHor->Add(m_kernel_width_ctrl, 0, wxALL, 5);
     kernelHor->Add(m_kernel_height_ctrl, 0, wxALL, 5);
 
-    //  8.
-    // Радиобокс для выбора формы ядра
+    //  8. Радиобокс для выбора формы ядра
     wxBoxSizer*         kernelShapeCol       = new wxBoxSizer(wxVERTICAL);
     kernelShapeCol->Add(m_kernel_shape_radiobox_ctrl, 0, wxALL, 5);
 
-    //  9.
-    // Спин для выбора количества итераций
+    //  9. Спин для выбора количества итераций
     wxBoxSizer*         iterationsCol       = new wxBoxSizer(wxVERTICAL);
     iterationsCol->Add(new wxStaticText(this, -1, "Итерации"), 0, wxALL, 5);
     iterationsCol->Add(m_iterations_spin_ctrl, 0, wxALL, 5);
 
-    //  10.
-    // Выпадающий список для выбора типа границ
+    //  10. Выпадающий список для выбора типа границ
     wxBoxSizer*         typeBodersCol       = new wxBoxSizer(wxVERTICAL);
     typeBodersCol->Add(new wxStaticText(this, -1, "Типы границ"), 0, wxALL, 5);
     typeBodersCol->Add(m_border_chois_ctrl, 0, wxALL, 5);
 
-    //  11.
-    //  Радиобокс для выбора типа морфологической обработки "Полутона/цвет"
+    //  11.  Радиобокс для выбора типа морфологической обработки "Полутона/цвет"
     wxBoxSizer*         gray_colorCol       = new wxBoxSizer(wxVERTICAL);
     gray_colorCol->Add(m_gray_color_radiobox_ctrl, 0, wxALL, 5);
 
@@ -751,16 +744,23 @@ std::string erodeAfterAdaptiveTestFrame::getSignatureText(){
     "\n,    int    blockSize"
     "\n,    double Offset"
     "\n);"
+    "\n;"
     "void cv::erode("
     "\n     cv::InputArray src"
     "\n,    cv::OutputArray dst"
-    "\n,    cv::InputArray element"
+    "\n,    cv::InputArray cv::getStructuringElement()"
     "\n,    cv::Point anchor = cv::Point(-1, -1)"
     "\n,    int iterations = 1"
     "\n,    int borderType = cv::BORDER_CONSTANT"
     "\n,    const v::Scalar& borderValue ="
     "\n             cv::morphologyDefaultBorderValue()"
-    "\n );"
+    "\n);"
+    "\n"
+    "cv::Mat cv::getStructuringElement("
+    "\n,    int       shape"
+    "\n,    cv::Size  ksize"
+    "\n,    cv::Point anchor = cv::Point(-1,-1)"
+    "\n);"
     ;
 
     return signature_text;
@@ -796,7 +796,6 @@ int erodeAfterAdaptiveTestFrame::GetSelectedMorphShape() {
 
     return m_kernel_shape;
 }
-
 
 //  Функция получения строки выбора варианта морфологической обработки "Серый/Цветной"
 wxArrayString   erodeAfterAdaptiveTestFrame::getGrayOrColor(){

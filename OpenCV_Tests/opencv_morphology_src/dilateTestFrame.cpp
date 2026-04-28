@@ -6,7 +6,7 @@
  * Author:    Sergej E. Heckel (Solar_Wind1956@yahoo.com)
  *              with insightful support from Gemini (AI)
  * 	                "Дорогу осилит идущий, а вдвоем идти спорее"
- * Created:   2026-04-21
+ * Created:   2026-04-23
  * Copyright: Sergi E. Heckel (https://sites.google.com/view/sergej-heckel)
  * License:
  *************************************************************
@@ -25,10 +25,13 @@
     V.     	Фильтрация изображения OpenCV
     VI.		Прорисовка изображений OpenCV в формате библиотеки wxVidgets
 */
-dilateTestFrame::dilateTestFrame  ( wxWindow  *   parent)
-                                : wxPanel   (   parent          //  Инициализируем как панель
-                                            ,   wxID_ANY
-                                            )
+dilateTestFrame::dilateTestFrame  ( wxWindow  *   parent, const wxString& title)
+                        : wxFrame   (   parent
+                                    ,   wxID_ANY
+                                    ,   title
+                                    ,   wxDefaultPosition
+                                    ,   wxSize(800, 600)
+                                    )
 {
     //  I.  ------------------------------------------------------------------------------------------------
     //  Создадим информационную панель,
@@ -347,16 +350,16 @@ void dilateTestFrame::ApplyMorphologicalTransformations() {
     // Вся "кухня" OpenCV здесь
     m_kernel_shape = GetSelectedMorphShape();
     cv::dilate   (   m_cv_original_img
-                ,   m_cv_filtered_img
-                ,   cv::getStructuringElement   (   m_kernel_shape
-                                                ,   cv::Size(m_kernel_width, m_kernel_height)
-                                                ,   cv::Point(-1, -1)
-                                                )
-                ,   cv::Point(-1, -1)
-                ,   m_iterations
-                ,   m_border_extrapolation
-                ,   cv::morphologyDefaultBorderValue()
-                );
+                 ,   m_cv_filtered_img
+                 ,   cv::getStructuringElement   (   m_kernel_shape
+                                                 ,   cv::Size(m_kernel_width, m_kernel_height)
+                                                 ,   cv::Point(-1, -1)
+                                                 )
+                 ,   cv::Point(-1, -1)
+                 ,   m_iterations
+                 ,   m_border_extrapolation
+                 ,   cv::morphologyDefaultBorderValue()
+                 );
 }
 std::string dilateTestFrame::getSignatureText(){
 

@@ -50,10 +50,10 @@ using namespace color_output;
     --------------------------------------------------------------------------------------------------------------------
     Класс тестового фрейма для изображений и компонетнов управления
 */
-class erodeAfterAdaptiveTestFrame : public wxPanel
+class erodeAfterAdaptiveTestFrame : public wxFrame
 {
  public :
-    erodeAfterAdaptiveTestFrame(wxWindow* parent);
+    erodeAfterAdaptiveTestFrame(wxWindow* parent, const wxString& title);
 
     wxPanel             *   m_informPanel;                //  Информация о тестировании
     wxPanel             *   m_filtering_namePanel;        //  Вид фильтрации
@@ -98,24 +98,24 @@ class erodeAfterAdaptiveTestFrame : public wxPanel
     ZoomSliderCtrl      *   m_zoom_slider_ctrl;
     //  2.
     wxSpinCtrlDouble    *   m_spin_maxValue_ctrl;
-    double                  m_maxValue                  = 250.0;
+    double                  m_maxValue                      = 250.0;
     //  3.
     wxChoice            *   m_choice_adaptiveMethod_ctrl;
-    int                     m_adaptiveMethod             = cv::ADAPTIVE_THRESH_GAUSSIAN_C;
+    int                     m_adaptiveMethod                = cv::ADAPTIVE_THRESH_GAUSSIAN_C;
     //  4.
     wxChoice            *   m_choice_adaptiveType_ctrl;
-    int                     m_adaptiveType              = cv::THRESH_BINARY;
+    int                     m_adaptiveType                  = cv::THRESH_BINARY;
     //  5.
     wxSpinCtrl          *   m_spin_blockSize_ctrl;
-    int                     m_blockSize         = 21;
+    int                     m_blockSize                     = 21;
     //  6.
     wxSpinCtrlDouble    *   m_spin_Offset_ctrl;
-    double                  m_Offset          = -3.0;      //  Какое-то смещение
+    double                  m_Offset                        = -3.0;      //  Какое-то смещение
     //  7.
     KernelMatrixCtrl    *   m_kernel_width_ctrl;
-    int                     m_kernel_width              = 3;
+    int                     m_kernel_width                  = 3;
     KernelMatrixCtrl    *   m_kernel_height_ctrl;
-    int                     m_kernel_height             = 3;
+    int                     m_kernel_height                 = 3;
     //  8.
     wxRadioBox          *   m_kernel_shape_radiobox_ctrl;
     int                     m_kernel_shape = cv::MORPH_RECT;
@@ -124,11 +124,11 @@ class erodeAfterAdaptiveTestFrame : public wxPanel
     int                     m_iterations = 1;
     //  10.
     wxChoice            *   m_border_chois_ctrl;
-    int                     m_border_extrapolation      = cv::BORDER_CONSTANT;
+    int                     m_border_extrapolation          = cv::BORDER_CONSTANT;
     //  11.
     //  Флаг переключения типа морфологической трансформации "Полутона" / "Цвет"
     wxRadioBox          *   m_gray_color_radiobox_ctrl;
-    int                     m_gray_color_idx             = 0;   //  Gray
+    int                     m_gray_color_idx                = 0;   //  Gray
 
     void OnResize(wxSizeEvent& event);
 

@@ -25,10 +25,13 @@
     V.     	Фильтрация изображения OpenCV
     VI.		Прорисовка изображений OpenCV в формате библиотеки wxVidgets
 */
-erodeAfterThresholdTestFrame::erodeAfterThresholdTestFrame  ( wxWindow  *   parent)
-                                                : wxPanel   (   parent          //  Инициализируем как панель
-                                                            ,   wxID_ANY
-                                                            )
+erodeAfterThresholdTestFrame::erodeAfterThresholdTestFrame  ( wxWindow  *   parent, const wxString& title)
+                        : wxFrame   (   parent
+                                    ,   wxID_ANY
+                                    ,   title
+                                    ,   wxDefaultPosition
+                                    ,   wxSize(800, 600)
+                                    )
 {
     //  I.  ------------------------------------------------------------------------------------------------
     //  Создадим информационную панель,
@@ -63,7 +66,7 @@ erodeAfterThresholdTestFrame::erodeAfterThresholdTestFrame  ( wxWindow  *   pare
                                                 ,   wxID_ANY
                                                 ,   wxT("Отладочный виджет")
                                                 ,   wxDefaultPosition
-                                                ,   wxSize (880, 330)
+                                                ,   wxDefaultSize//wxSize (880, 330)
                                                 ,   wxTE_MULTILINE
                                                 );
 
@@ -78,6 +81,114 @@ erodeAfterThresholdTestFrame::erodeAfterThresholdTestFrame  ( wxWindow  *   pare
     m_scrolled_wind_filtered        =   new wxScrolledWindow(this);
     m_scrolled_wind_transformed     =   new wxScrolledWindow(this);
 
+    //  ------------------------------------------------------------------------------------------------------
+    //  Подготовка панели управления отображением изображений
+    //  1.
+    m_zoom_slider_ctrl      =   new ZoomSliderCtrl(this);
+
+    //  2.  Пороговое значение для threshold
+    m_spin_thresh_ctrl      =   new wxSpinCtrlDouble    (   this
+                                                        ,   wxID_ANY
+                                                        ,   wxEmptyString
+                                                        ,   wxDefaultPosition
+                                                        ,   wxDefaultSize
+                                                        ,   wxSP_ARROW_KEYS
+                                                        ,   1.0     // Минимум: разрешаем 0 для авторасчета
+                                                        ,   255.0    // Максимум: 10 достаточно для экспериментов
+                                                        ,   127.0     // Начальное значение
+                                                        ,   1.     // Шаг: золотая середина для визуального теста
+                                                        );
+    //  Дополнительно количество знаков после запятой
+    m_spin_thresh_ctrl->SetDigits(1);
+
+    //  3.  Максимальное значение порога фильтра
+    m_spin_maxValue_ctrl    =   new wxSpinCtrlDouble    (   this
+                                                        ,   wxID_ANY
+                                                        ,   wxEmptyString
+                                                        ,   wxDefaultPosition
+                                                        ,   wxDefaultSize
+                                                        ,   wxSP_ARROW_KEYS
+                                                        ,   1.0     // Минимум: разрешаем 0 для авторасчета
+                                                        ,   255.0    // Максимум:
+                                                        ,   255.0     // Начальное значение
+                                                        ,   1.0     // Шаг: золотая середина для визуального теста
+                                                        );
+    //  Дополнительно количество знаков после запятой
+    m_spin_maxValue_ctrl->SetDigits(1);
+
+    //  4.  Тип операции для threshold (thresholdType)
+    wxString    thresholdTypes[] =  {   wxT("cv::THRESH_BINARY")        //
+                                    ,   wxT("cv::THRESH_BINARY_INV")    //
+                                    ,   wxT("cv::THRESH_TRUNC")         //
+                                    ,   wxT("cv::THRESH_TOZERO")        //
+                                    ,   wxT("cv::THRESH_TOZERO_INV")    //
+                                    };
+    m_choice_threshold_type_ctrl  =   new wxChoice   (   this
+                                                     ,   wxID_ANY
+                                                     ,   wxDefaultPosition
+                                                     ,   wxSize(180, -1)
+                                                     ,   WXSIZEOF(thresholdTypes)
+                                                     ,   thresholdTypes
+                                                     ,   0
+                                                     );
+    m_choice_threshold_type_ctrl->SetStringSelection(wxT("cv::THRESH_BINARY"));
+
+    //  5.  Размеры неквадратного ядра
+    m_kernel_width_ctrl     =   new KernelMatrixCtrl(this, wxID_ANY, wxPoint(0, 0), wxSize(100, 100));
+    m_kernel_width_ctrl->SetMinSize(wxSize(100, 100));           // Фиксируем минимальное присутствие
+    m_kernel_height_ctrl    =   new KernelMatrixCtrl(this, wxID_ANY, wxPoint(0, 0), wxSize(100, 100));
+    m_kernel_height_ctrl->SetMinSize(wxSize(100, 100));           // Фиксируем минимальное присутствие
+
+    //  6.  Форма ядра
+    m_kernel_shape_radiobox_ctrl    =   new wxRadioBox  (   this
+                                                        ,   wxID_ANY
+                                                        ,   wxT("Выбор формы ядра")
+                                                        ,   wxDefaultPosition
+                                                        ,   wxDefaultSize
+                                                        ,   getKernelShape()
+                                                        ,   1
+                                                        ,   wxRA_SPECIFY_COLS
+                                                        );
+    //  7.  Количество итераций
+    m_iterations_spin_ctrl  =   new wxSpinCtrl   (   this
+                                                 ,   wxID_ANY
+                                                 ,   wxEmptyString
+                                                 ,   wxDefaultPosition
+                                                 ,   wxDefaultSize
+                                                 ,   wxSP_ARROW_KEYS
+                                                 ,   1
+                                                 ,   10
+                                                 ,   1
+                                                 );
+
+    //  8.  Тип границы (borderType)
+    wxString    TypesStrings[] =    {   wxT("cv::BORDER_CONSTANT")  //  заполнение цветом (по умолчанию)
+                                    ,   wxT("cv::BORDER_REPLICATE") //  повтор последнего пикселя (а-а-а-а)
+                                    ,   wxT("cv::BORDER_REFLECT")   //  зеркало (абв|вба)
+                                    };
+
+    m_border_chois_ctrl     =   new wxChoice     (   this
+                                                 ,   wxID_ANY
+                                                 ,   wxDefaultPosition
+                                                 ,   wxSize(180, -1)
+                                                 ,   WXSIZEOF(TypesStrings)
+                                                 ,   TypesStrings
+                                                 ,   0
+                                                 );
+    m_border_chois_ctrl->SetStringSelection(wxT("cv::BORDER_CONSTANT"));
+
+    //  9.  Флаг переключения типа морфологической трансформации "Полутона" / "Цвет"
+    m_gray_color_radiobox_ctrl  =   new wxRadioBox  (   this
+                                                    ,   wxID_ANY
+                                                    ,   wxT("Выбор режима 'erode'")
+                                                    ,   wxDefaultPosition
+                                                    ,   wxDefaultSize
+                                                    ,   getGrayOrColor()
+                                                    ,   1
+                                                    ,   wxRA_SPECIFY_COLS
+                                                    );
+
+
     //  II.    --------------------------------------------------------------------------------------------
     //  Сайзеры
     //  ----------------------------------------------------------------------------------------------------
@@ -91,7 +202,6 @@ erodeAfterThresholdTestFrame::erodeAfterThresholdTestFrame  ( wxWindow  *   pare
     informHSizer->Add(m_debugPanel, 1, wxCENTER | wxALL, 5);
 
     m_informPanel->SetSizer(informHSizer);
-
 
     //  ----------------------------------------------------------------------------------------------------
     //  II.2. Сайзеры для отображения различных вариантов исследуемого изображения
@@ -112,119 +222,6 @@ erodeAfterThresholdTestFrame::erodeAfterThresholdTestFrame  ( wxWindow  *   pare
     imagesHSizer->Add(m_scrolled_wind_filtered,     1, wxEXPAND | wxALL, 5);    // Растягивается
     imagesHSizer->Add(m_scrolled_wind_transformed,  1, wxEXPAND | wxALL, 5);    // Растягивается
 
-    //  ------------------------------------------------------------------------------------------------------
-    //  Подготовка панели управления отображением изображений
-    //  1.
-    m_zoom_slider_ctrl      =   new ZoomSliderCtrl(this);
-
-    //  2.  Пороговое значение для threshold
-    m_spin_thresh_ctrl      =   new wxSpinCtrlDouble    (   this
-                                                        ,   wxID_ANY
-                                                        ,   wxEmptyString
-                                                        ,   wxDefaultPosition
-                                                        ,   wxDefaultSize
-                                                        ,   wxSP_ARROW_KEYS
-                                                        ,   1.0     // Минимум: разрешаем 0 для авторасчета
-                                                        ,   255.0    // Максимум: 10 достаточно для экспериментов
-                                                        ,   127     // Начальное значение
-                                                        ,   1.     // Шаг: золотая середина для визуального теста
-                                                        );
-    //  Дополнительно количество знаков после запятой
-    m_spin_thresh_ctrl->SetDigits(1);
-
-    //  Максимальное значение порога фильтра
-    //  3.
-    m_spin_maxValue_ctrl    =   new wxSpinCtrlDouble    (   this
-                                                        ,   wxID_ANY
-                                                        ,   wxEmptyString
-                                                        ,   wxDefaultPosition
-                                                        ,   wxDefaultSize
-                                                        ,   wxSP_ARROW_KEYS
-                                                        ,   1.0     // Минимум: разрешаем 0 для авторасчета
-                                                        ,   255.0    // Максимум:
-                                                        ,   255     // Начальное значение
-                                                        ,   1.0     // Шаг: золотая середина для визуального теста
-                                                        );
-    //  Дополнительно количество знаков после запятой
-    m_spin_maxValue_ctrl->SetDigits(1);
-
-    //  4.
-    //  Тип операции для threshold (thresholdType)
-    wxString    thresholdTypes[] =  {   wxT("cv::THRESH_BINARY")        //
-                                    ,   wxT("cv::THRESH_BINARY_INV")    //
-                                    ,   wxT("cv::THRESH_TRUNC")         //
-                                    ,   wxT("cv::THRESH_TOZERO")        //
-                                    ,   wxT("cv::THRESH_TOZERO_INV")    //
-                                    };
-    m_choice_threshold_type_ctrl  =   new wxChoice   (   this
-                                                     ,   wxID_ANY
-                                                     ,   wxDefaultPosition
-                                                     ,   wxSize(180, -1)
-                                                     ,   WXSIZEOF(thresholdTypes)
-                                                     ,   thresholdTypes
-                                                     ,   0
-                                                     );
-    m_choice_threshold_type_ctrl->SetStringSelection(wxT("cv::THRESH_BINARY"));
-
-    //  5.
-    m_kernel_width_ctrl     =   new KernelMatrixCtrl(this, wxID_ANY, wxPoint(0, 0), wxSize(100, 100));
-    m_kernel_width_ctrl->SetMinSize(wxSize(100, 100));           // Фиксируем минимальное присутствие
-    m_kernel_height_ctrl    =   new KernelMatrixCtrl(this, wxID_ANY, wxPoint(0, 0), wxSize(100, 100));
-    m_kernel_height_ctrl->SetMinSize(wxSize(100, 100));           // Фиксируем минимальное присутствие
-
-    //  6.
-    //  Форма ядра
-    m_kernel_shape_radiobox_ctrl    =   new wxRadioBox  (   this
-                                                        ,   wxID_ANY
-                                                        ,   wxT("Выбор формы ядра")
-                                                        ,   wxDefaultPosition
-                                                        ,   wxDefaultSize
-                                                        ,   getKernelShape()
-                                                        ,   1
-                                                        ,   wxRA_SPECIFY_COLS
-                                                        );
-    //  7.
-    //  Количество итераций
-    m_iterations_spin_ctrl  =   new wxSpinCtrl   (   this
-                                                 ,   wxID_ANY
-                                                 ,   wxEmptyString
-                                                 ,   wxDefaultPosition
-                                                 ,   wxDefaultSize
-                                                 ,   wxSP_ARROW_KEYS
-                                                 ,   1
-                                                 ,   10
-                                                 ,   1
-                                                 );
-
-    //  8.
-    //  Тип границы (borderType)
-    wxString    TypesStrings[] =    {   wxT("cv::BORDER_CONSTANT")  //  заполнение цветом (по умолчанию)
-                                    ,   wxT("cv::BORDER_REPLICATE") //  повтор последнего пикселя (а-а-а-а)
-                                    ,   wxT("cv::BORDER_REFLECT")   //  зеркало (абв|вба)
-                                    };
-
-    m_border_chois_ctrl     =   new wxChoice     (   this
-                                                 ,   wxID_ANY
-                                                 ,   wxDefaultPosition
-                                                 ,   wxSize(180, -1)
-                                                 ,   WXSIZEOF(TypesStrings)
-                                                 ,   TypesStrings
-                                                 ,   0
-                                                 );
-    m_border_chois_ctrl->SetStringSelection(wxT("cv::BORDER_CONSTANT"));
-
-    //  9.
-    //  Флаг переключения типа морфологической трансформации "Полутона" / "Цвет"
-    m_gray_color_radiobox_ctrl  =   new wxRadioBox  (   this
-                                                    ,   wxID_ANY
-                                                    ,   wxT("Выбор режима 'erode'")
-                                                    ,   wxDefaultPosition
-                                                    ,   wxDefaultSize
-                                                    ,   getGrayOrColor()
-                                                    ,   1
-                                                    ,   wxRA_SPECIFY_COLS
-                                                    );
-
     //  ----------------------------------------------------------------------------------------------------
     //  II.3. Сайзеры для панели настроек и управления
     wxBoxSizer*         controlPanelHSizer   = new wxBoxSizer(wxHORIZONTAL);
@@ -240,44 +237,37 @@ erodeAfterThresholdTestFrame::erodeAfterThresholdTestFrame  ( wxWindow  *   pare
     thresholdCol->Add(new wxStaticText(this, -1, "Порог для threshold"), 0, wxALL, 5);
     thresholdCol->Add(m_spin_thresh_ctrl, 0, wxALL, 5);
 
-    //  Максимальные значения для threshold и для AdaptiveShreshold
-    //  3.
+    //  3.  Максимальные значения для threshold и для AdaptiveShreshold
     wxBoxSizer*         maxValue_Col       = new wxBoxSizer(wxVERTICAL);
     maxValue_Col->Add(new wxStaticText(this, -1, "maxValue Threshold"), 0, wxALL, 5);
     maxValue_Col->Add(m_spin_maxValue_ctrl, 0, wxALL, 5);
 
-    //  4.
-    // Типы операции для threshold
+    //  4.  Типы операции для threshold
     wxBoxSizer*         threshold_type_Col       = new wxBoxSizer(wxVERTICAL);
     threshold_type_Col->Add(new wxStaticText(this, -1, "Тип операци Threshold"), 0, wxALL, 5);
     threshold_type_Col->Add(m_choice_threshold_type_ctrl, 0, wxALL, 5);
 
-    //  5.
-    // Матрицы для ширины и высоты ядра
+    //  5.  Матрицы для ширины и высоты ядра
     wxBoxSizer*         kernelHor           = new wxBoxSizer(wxHORIZONTAL);
     kernelHor->Add(new wxStaticText(this, -1, " Ширина\n и высота\n неквадратного\n ядра"), 0, wxALL, 5);
     kernelHor->Add(m_kernel_width_ctrl, 0, wxALL, 5);
     kernelHor->Add(m_kernel_height_ctrl, 0, wxALL, 5);
 
-    //  6.
-    // Радиобокс для выбора формы ядра
+    //  6.  Радиобокс для выбора формы ядра
     wxBoxSizer*         kernelShapeCol       = new wxBoxSizer(wxVERTICAL);
     kernelShapeCol->Add(m_kernel_shape_radiobox_ctrl, 0, wxALL, 5);
 
-    //  7.
-    // Спин для выбора количества итераций
+    //  7.  Спин для выбора количества итераций
     wxBoxSizer*         iterationsCol       = new wxBoxSizer(wxVERTICAL);
     iterationsCol->Add(new wxStaticText(this, -1, "Итерации"), 0, wxALL, 5);
     iterationsCol->Add(m_iterations_spin_ctrl, 0, wxALL, 5);
 
-    //  8.
-    // Выпадающий список для выбора типа границ
+    //  8.  Выпадающий список для выбора типа границ
     wxBoxSizer*         typeBodersCol       = new wxBoxSizer(wxVERTICAL);
     typeBodersCol->Add(new wxStaticText(this, -1, "Типы границ"), 0, wxALL, 5);
     typeBodersCol->Add(m_border_chois_ctrl, 0, wxALL, 5);
 
-    //  9.
-    //  Радиобокс для выбора типа морфологической обработки "Полутона/цвет"
+    //  9.  Радиобокс для выбора типа морфологической обработки "Полутона/цвет"
     wxBoxSizer*         gray_colorCol       = new wxBoxSizer(wxVERTICAL);
     gray_colorCol->Add(m_gray_color_radiobox_ctrl, 0, wxALL, 5);
 
@@ -316,6 +306,7 @@ erodeAfterThresholdTestFrame::erodeAfterThresholdTestFrame  ( wxWindow  *   pare
     //  Привязка обработчиков событий
     //  В конструкторе теперь только "регистрация"
     //  1.
+
     m_zoom_slider_ctrl->Bind(wxEVT_SLIDER, &erodeAfterThresholdTestFrame::OnZoomSliderChanged, this);
     //  2.
     m_spin_thresh_ctrl->Bind(wxEVT_SPINCTRLDOUBLE, &erodeAfterThresholdTestFrame::OnThreshChanged, this);
@@ -349,19 +340,17 @@ erodeAfterThresholdTestFrame::erodeAfterThresholdTestFrame  ( wxWindow  *   pare
     //  VI. ----------------------------------------------------------------------------------------------------------------
     //  Отображение всех изображений
     UpdateAllViews();
-
     //  ----------------------------------------------------------------------------------------------------------------
-    Center () ;
+    Center();
 }
 
 void erodeAfterThresholdTestFrame::OnResize(wxSizeEvent& event)
 {
-    // Проверяем, созданы ли уже нужные объекты
-    if (!m_staticPreviewBitmap || !m_originalBitmap.IsOk()) {
+    // Добавляем проверку слайдера! Если он еще не создан, UpdateAllViews его убьет.
+    if (!m_staticPreviewBitmap || !m_zoom_slider_ctrl || !m_originalBitmap.IsOk()) {
         event.Skip();
         return;
     }
-
     UpdateAllViews();
 
     Layout();
@@ -513,8 +502,10 @@ void erodeAfterThresholdTestFrame::OnBorderExtrapolChanged(wxCommandEvent& event
 //  9.
 void erodeAfterThresholdTestFrame::OnGrayOrColorChanged(wxCommandEvent& event) {
     m_gray_color_idx    =   event.GetInt();
+    #if 0
     std::wstring msg = L"\nm_gray_color_idx: " + std::to_wstring(m_gray_color_idx);
     m_debugInfo->AppendText(msg);
+    #endif // 0
     // 1. Запускаем обработку OpenCV
     ApplyMixedTransformation();
 
@@ -528,6 +519,8 @@ void erodeAfterThresholdTestFrame::OnGrayOrColorChanged(wxCommandEvent& event) {
 
 // Универсальная функция, которая знает про оба окна
 void erodeAfterThresholdTestFrame::UpdateAllViews() {
+
+    if (m_cv_original_img.empty()) return;
     //  Визуализация оригинального и отфильтрованного изображения (выводим оба состояния)
 
     //  Преобразования для вывода оригинального изображения OpenCV в формате библиотеки wxVidgets
@@ -542,45 +535,47 @@ void erodeAfterThresholdTestFrame::UpdateAllViews() {
     // Для каждого выходного изображения делаем так:
 
     // Превращаем из GRAY в RGB (чтобы было 3 канала: R=G=B)
-    cv::cvtColor(m_cv_filtered_img, out1_for_display, cv::COLOR_GRAY2RGB);
+    cv::cvtColor(m_cv_filtered_img, m_filtered_img_for_display, cv::COLOR_GRAY2RGB);
 
-    UpdateDisplay   (   m_wx_img
-                    ,   out1_for_display
-                    ,   m_filteredBitmap
-                    ,   m_staticFilteredBitmap
-                    ,   m_scrolled_wind_filtered
-                    ,   m_zoom_slider_ctrl->m_zoom
-                    );
+    if (!m_cv_filtered_img.empty()) {
+        cv::cvtColor(m_cv_filtered_img, m_filtered_img_for_display, cv::COLOR_GRAY2RGB);
 
-
+        UpdateDisplay   (   m_wx_img
+                        ,   m_filtered_img_for_display
+                        ,   m_filteredBitmap
+                        ,   m_staticFilteredBitmap
+                        ,   m_scrolled_wind_filtered
+                        ,   m_zoom_slider_ctrl->m_zoom
+                        );
+    }
     //  Преобразования для вывода отфильтрованного изображения OpenCV в формате библиотеки wxVidgets
 
     // Превращаем из GRAY в RGB (чтобы было 3 канала: R=G=B)
-
-    cv::Mat mat_for_display;
-    // Если адаптив выдал 1 канал (а он всегда выдает 1)
+    // Если глобальый пороговый фильтр выдал 1 канал (а он всегда выдает 1)
     if (m_cv_transformed_img.channels() == 1) {
         // Дублируем канал серого в R, G и B, чтобы wxImage "понял" картинку
-        cv::cvtColor(m_cv_transformed_img, mat_for_display, cv::COLOR_GRAY2RGB);
+        cv::cvtColor(m_cv_transformed_img, m_transformed_img_for_display, cv::COLOR_GRAY2RGB);
     } else {
-        mat_for_display = m_cv_transformed_img;
+        m_transformed_img_for_display = m_cv_transformed_img.clone();
     }
 
     UpdateDisplay   (   m_wx_img
-                    ,   mat_for_display
+                    ,   m_transformed_img_for_display
                     ,   m_transformedBitmap
-                    ,   m_staticTransformeddBitmap
+                    ,   m_staticTransformedBitmap
                     ,   m_scrolled_wind_transformed
                     ,   m_zoom_slider_ctrl->m_zoom
                     );
 
     //  Внутри панели создаем битмэп и статический битмап для вывода предварительного оригинального изображения
+
     int     previewW    = m_previewPanel->GetSize().x;
 
     m_previewBitmap       = GetScaledBitmap(m_originalBitmap, previewW, previewW);
     m_staticPreviewBitmap->SetBitmap(m_previewBitmap);
     m_previewPanel->Layout();
     m_previewPanel->Refresh();
+
 }
 //  -----------------------------------------------------------------------------------------------------
 //  Экосистема OpenCV
@@ -588,46 +583,49 @@ void erodeAfterThresholdTestFrame::ApplyMixedTransformation() {
     // 1. Проверка: загружена ли картинка?
     if (m_cv_original_img.empty()) return;
 
-    #if 0
-    MessageBoxW(NULL, L"Работает", L"ApplyMixedTransformation()", MB_OK | MB_ICONINFORMATION);
-    #endif
-    // Вся "кухня" OpenCV здесь
-    //if (m_cv_original_img.empty()) return;
-
     // 1. Создаем ВРЕМЕННУЮ серую копию, не портя оригинал!
-    cv::Mat gray;
     if (m_cv_original_img.channels() == 3)
-        cv::cvtColor(m_cv_original_img, gray, cv::COLOR_BGR2GRAY);
+        cv::cvtColor(m_cv_original_img, m_gray_original_img, cv::COLOR_BGR2GRAY);
     else
-        gray = m_cv_original_img.clone();
+        m_gray_original_img = m_cv_original_img.clone();
 
-    cv::threshold       (   gray                    //  входное изображение
+    cv::threshold       (   m_gray_original_img     //  входное изображение
                         ,   m_cv_filtered_img       //  выходное изображение
                         ,   m_thresh                //  пороговое значение
                         ,   m_maxValue
                         ,   m_threshold_type        //  тип операции cv::THRESH_TRUNC //
                         );
-    #if 1
+    #if 0
     std::wstring msg = L"\nmean(m_cv_filtered_img)[0]: " + std::to_wstring(cv::mean(m_cv_filtered_img)[0]);
     m_debugInfo->AppendText(msg);
     #endif
 
-   cv::Mat image_for_transform;
+    //  Морфологическое преобразование `erode`
+    if (1 == m_gray_color_idx) { // Если выбран режим "Цвет"
+        if (m_cv_filtered_img.channels() == 1) {
+            // Маска (m_cv_filtered_img) должна быть того же размера, что и оригинал
+            // Операция оставит оригинальные цвета там, где в маске 255, и сделает черным там, где 0
+            cv::bitwise_and(m_cv_original_img, m_cv_original_img, m_image_for_transform, m_cv_filtered_img);
+            /*
+                Маска — это «трафарет».
 
-    if (1 == m_gray_color_idx) { // Выбран режим "Цвет"
-        if (m_cv_filtered_img.channels() == 3) {
-            // ПРЕОБРАЗУЕМ: из 1 канала (серый) в 3 канала (цветной формат)
-            cv::cvtColor(m_cv_filtered_img, image_for_transform, cv::COLOR_GRAY2BGR);
-        } else {
-            image_for_transform = m_cv_filtered_img.clone();
+                С помощью bitwise_and() мы накладываем её на цветной оригинал.
+
+                Морфология — может работать и с маской (для логики),
+                и с цветом (для визуальных эффектов или сегментации).
+            */
+        }   else {
+            m_image_for_transform = m_cv_filtered_img.clone();
         }
     } else {
-        // Работаем в честном Грее
-        image_for_transform = m_cv_filtered_img.clone();
+        m_image_for_transform = m_cv_filtered_img.clone();
     }
 
+    if (m_image_for_transform.empty())
+        return;
+
     m_kernel_shape = GetSelectedMorphShape();
-    cv::erode   (   image_for_transform
+    cv::erode   (   m_image_for_transform
                 ,   m_cv_transformed_img
                 ,   cv::getStructuringElement   (   m_kernel_shape
                                                 ,   cv::Size(m_kernel_width, m_kernel_height)
@@ -638,16 +636,6 @@ void erodeAfterThresholdTestFrame::ApplyMixedTransformation() {
                 ,   m_border_extrapolation
                 ,   cv::morphologyDefaultBorderValue()
                 );
-
-    #if 1
-    msg = L"\nmean(m_cv_transformed_img)[0]: " + std::to_wstring(cv::mean(m_cv_transformed_img)[0]);
-    m_debugInfo->AppendText(msg);
-
-    msg = L"\nthreshold::m_maxValue: " + std::to_wstring(m_maxValue);
-    m_debugInfo->AppendText(msg);
-
-    #endif
-
 }
 
 std::string erodeAfterThresholdTestFrame::getSignatureText(){
@@ -688,7 +676,6 @@ wxArrayString   erodeAfterThresholdTestFrame::getKernelShape(){
     return   strings;
 }
 int erodeAfterThresholdTestFrame::GetSelectedMorphShape() {
-    // Допустим, m_shapeRadioBox — это ваш контрол с выбором формы
     int selection = m_kernel_shape_radiobox_ctrl->GetSelection();
 
     switch (selection)
@@ -708,7 +695,6 @@ int erodeAfterThresholdTestFrame::GetSelectedMorphShape() {
 
     return m_kernel_shape;
 }
-
 
 //  Функция получения строки выбора варианта морфологической обработки "Серый/Цветной"
 wxArrayString   erodeAfterThresholdTestFrame::getGrayOrColor(){
