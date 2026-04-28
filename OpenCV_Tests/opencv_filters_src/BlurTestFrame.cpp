@@ -1,13 +1,13 @@
 //  BlurTestFrame.cpp
 /*
  ***************************************************************
- * Name:      BlurTestFrame.cpp
+ * Name:      OpenCV_Tester.cpp
  * Purpose:   Code for Application Class
- * Author:    Sergi E. Heckel (Solar_Wind1956@yahoo.com)
+ * Author:    Sergej E. Heckel (Solar_Wind1956@yahoo.com)
  *              with insightful support from Gemini (AI)
  * 	                "Дорогу осилит идущий, а вдвоем идти спорее"
- * Created:   2026-04-22
- * Copyright: Sergi E. Heckel (www.Solar_Wind1956.com)
+ * Created:   2026-04-21
+ * Copyright: Sergi E. Heckel (https://sites.google.com/view/sergej-heckel)
  * License:
  *************************************************************
 */
@@ -18,31 +18,33 @@
 //	-----------------------------------------------------------------------------------------------------
 /*
     Конструктор выполняет следующие блоки операций:
-    I. 		Создание панели для предварительного просмотра и прокручивающихся окон
+    I. 		Создание  информационной панели, панели для предварительного просмотра и прокручивающихся окон
     II.		Создание системы сайзеров
     III.	Привязка обработчиков событий
     IV.		Считывание изображения из дискового файла с использование стандартного диалога открытия файлов
     V.     	Фильтрация изображения OpenCV
     VI.		Прорисовка изображений OpenCV в формате библиотеки wxVidgets
 */
-BlurTestFrame::BlurTestFrame    ( wxWindow  *   parent)
-                        : wxPanel   (   parent          //  Инициализируем как панель
+BlurTestFrame::BlurTestFrame    (wxWindow  *   parent, const wxString& title)
+                        : wxFrame   (   parent
                                     ,   wxID_ANY
+                                    ,   title
+                                    ,   wxDefaultPosition
+                                    ,   wxSize(800, 600)
                                     )
 {
     //  I.  ------------------------------------------------------------------------------------------------
-    //  Создадим панель для предварительного просмотра оригинального изображения и
+    //  Создадим информационную панель,
+    //  панель для предварительного просмотра оригинального изображения и
     //  прокручивающиеся окна для изображений
     informPanel                 =   new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, -1));
     informPanel->SetMinSize(wxSize(-1, 50));
 
-    informPanel->SetBackgroundColour(*wxWHITE); // Чтобы визуально отделить
-    informPanel->SetBackgroundColour(*wxGREEN); // Чтобы визуально отделить
+    informPanel->SetBackgroundColour(*wxGREEN);             // Чтобы визуально отделить
     m_filter_name_text          =   new wxStaticText(informPanel, -1, wxT("Blur Filter Test") , wxPoint(0, 0));
     wxFont      m_filter_name_text_font(24, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
     m_filter_name_text->SetFont(m_filter_name_text_font);
     m_filter_name_text->SetForegroundColour(wxColour(255, 255, 0));
-    //m_filter_name_text->SetBackgroundColour(*wxGREEN);
 
     previewPanel                =   new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(200, -1));
     previewPanel->SetMinSize(wxSize(200, -1));
@@ -111,33 +113,8 @@ BlurTestFrame::BlurTestFrame    ( wxWindow  *   parent)
     Bind(wxEVT_SIZE, &OnResize, this);
 
     //  IV. -----------------------------------------------------------------------------------------------------
-
-    //  На случай сбоя при чтении файла cоздаем черное изображение 400x400, тип CV_8UC3 (8 бит, 3 канала RGB)
-    m_cv_original_img = cv::Mat::zeros(400, 400, CV_8UC3);
-
-    // По желанию: рисуем на нем текст, чтобы было понятно, что файл не загружен
-    cv::putText (   m_cv_original_img
-                ,   "No Image Loaded"
-                ,   cv::Point(50, 200)
-                ,   cv::FONT_HERSHEY_SIMPLEX
-                ,   1.0
-                ,   cv::Scalar(255, 255, 255) // Белый цвет
-                ,   2
-                );
-    //  Выбираем файл с изображением для считывания
-    wxString    fullFileName;               //  Переменная для получения полноо имени файла
-
-    if (!getFullFileName(fullFileName)){
-        cout << bright_red << "Ошибка получения полного имени файла. Завершение работы." << reset << endl;
-    } else {
-        // 	Считываем изображение из файла
-        cv::Mat  tempRGB = cv::imread(std::string(fullFileName), cv::COLOR_GRAY2RGB);   //  cv::IMREAD_GRAYSCALE
-        if(tempRGB.empty()){
-            cout << bright_red << std::string(fullFileName) + "Ошибка загрузки изображения. Завершение работы." << reset << endl;
-		} else {
-            cv::cvtColor(tempRGB, m_cv_original_img, cv::COLOR_BGR2RGB);
-		}
-	};
+    //  Получение матрицы фильтруемого изображения, считанного из дискового файла
+    m_cv_original_img   =   getOriginalImage();
 
 	//  V. --------------------------------------------------------------------------------------------------------------------
     //  Фильтрация оригинального изображения OpenCV
@@ -146,6 +123,9 @@ BlurTestFrame::BlurTestFrame    ( wxWindow  *   parent)
     //  VI. ----------------------------------------------------------------------------------------------------------------
     //  Отображение всех изображений
     UpdateAllViews();
+    #if 0
+    MessageBoxW(NULL, L"Blur", L"Отладочный маркер", MB_OK | MB_ICONINFORMATION);
+    #endif
 
     //  ----------------------------------------------------------------------------------------------------------------
     Center () ;
@@ -191,6 +171,7 @@ void BlurTestFrame::OnKernelChanged(wxCommandEvent& event) {
 
 // Универсальная функция, которая знает про оба окна
 void BlurTestFrame::UpdateAllViews() {
+
     //  Визуализация оригинального и отфильтрованного изображения (выводим оба состояния)
 
     //  Преобразования для вывода оригнинального изображения OpenCV в формате библиотеки wxVidgets
@@ -202,6 +183,9 @@ void BlurTestFrame::UpdateAllViews() {
                     ,   zoom_slider_ctrl->m_zoom
                     );
 
+    #if 0
+    MessageBoxW(NULL, L"Blur UpdateAllViews()", L"Отладочный маркер", MB_OK | MB_ICONINFORMATION);
+    #endif
     //  Преобразования для вывода отфильтрованного изображения OpenCV в формате библиотеки wxVidgets
     UpdateDisplay   (   m_wx_img
                     ,   m_cv_filtered_img
@@ -227,4 +211,3 @@ void BlurTestFrame::ApplyFilters() {
                 ,   cv::Size(m_kernel_size, m_kernel_size)
                 );
 }
-

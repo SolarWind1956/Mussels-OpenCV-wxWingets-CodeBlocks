@@ -25,10 +25,13 @@
     V.     	Фильтрация изображения OpenCV
     VI.		Прорисовка изображений OpenCV в формате библиотеки wxVidgets
 */
-thresholdTestFrame::thresholdTestFrame  ( wxWindow  *   parent)
-                                : wxPanel   (   parent          //  Инициализируем как панель
-                                            ,   wxID_ANY
-                                            )
+thresholdTestFrame::thresholdTestFrame  ( wxWindow  *   parent, const wxString& title)
+                        : wxFrame   (   parent
+                                    ,   wxID_ANY
+                                    ,   title
+                                    ,   wxDefaultPosition
+                                    ,   wxSize(800, 600)
+                                    )
 {
     //  I.  ------------------------------------------------------------------------------------------------
     //  Создадим информационную панель,
@@ -63,7 +66,7 @@ thresholdTestFrame::thresholdTestFrame  ( wxWindow  *   parent)
                                                 ,   wxID_ANY
                                                 ,   wxT("Отладочный виджет")
                                                 ,   wxDefaultPosition
-                                                ,   wxSize(440, 330)
+                                                ,   wxSize (880, 330)
                                                 ,   wxTE_MULTILINE
                                                 );
 
@@ -615,10 +618,10 @@ void thresholdTestFrame::ApplyFiltering() {
     msg = L"\nmean(m_cv_filtered_img_2)[0]: " + std::to_wstring(cv::mean(m_cv_filtered_img_2)[0]);
     m_debugInfo->AppendText(msg);
 
-    msg = L"\adaptiveThreshold::m_blockSize: " + std::to_wstring(m_blockSize);
+    msg = L"\nAdaptiveThreshold::m_blockSize: " + std::to_wstring(m_blockSize);
     m_debugInfo->AppendText(msg);
 
-    msg = L"\adaptiveThreshold::m_maxValue_2: " + std::to_wstring(m_maxValue_2);
+    msg = L"\nAdaptiveThreshold::m_maxValue_2: " + std::to_wstring(m_maxValue_2);
     m_debugInfo->AppendText(msg);
 
     #endif

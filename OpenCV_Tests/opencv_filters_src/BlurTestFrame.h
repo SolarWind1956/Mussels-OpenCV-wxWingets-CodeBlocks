@@ -1,13 +1,13 @@
 //  BlurTestFrame.h
 /*
  ***************************************************************
- * Name:      BlurTestFrame.h
+ * Name:      OpenCV_Tester.cpp
  * Purpose:   Code for Application Class
- * Author:    Sergi E. Heckel (Solar_Wind1956@yahoo.com)
+ * Author:    Sergej E. Heckel (Solar_Wind1956@yahoo.com)
  *              with insightful support from Gemini (AI)
  * 	                "Дорогу осилит идущий, а вдвоем идти спорее"
- * Created:   2026-04-22
- * Copyright: Sergi E. Heckel (www.Solar_Wind1956.com)
+ * Created:   2026-04-21
+ * Copyright: Sergej E. Heckel (https://sites.google.com/view/sergej-heckel)
  * License:
  *************************************************************
 */
@@ -45,10 +45,10 @@ using namespace color_output;
     --------------------------------------------------------------------------------------------------------------------
     Класс тестового фрейма для изображений и компонетнов управления
 */
-class BlurTestFrame : public wxPanel
+class BlurTestFrame : public wxFrame    //wxPanel
 {
  public :
-    BlurTestFrame(wxWindow* parent);
+    BlurTestFrame(wxWindow* parent, const wxString& title);
 
     wxPanel          *  informPanel;                //  Панель для вывода информации о тестировании
     wxStaticText     *  m_filter_name_text;
@@ -62,8 +62,8 @@ class BlurTestFrame : public wxPanel
     wxBitmap            filteredBitmap;
 
     wxStaticBitmap *    staticPreviewBitmap = nullptr;
-    wxStaticBitmap *    staticOriginalBitmap;
-    wxStaticBitmap *    staticFilteredBitmap;
+    wxStaticBitmap *    staticOriginalBitmap = nullptr;
+    wxStaticBitmap *    staticFilteredBitmap = nullptr;
 
 
     cv::Mat             m_cv_original_img;

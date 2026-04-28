@@ -50,10 +50,10 @@ using namespace color_output;
     --------------------------------------------------------------------------------------------------------------------
     Класс тестового фрейма для изображений и компонетнов управления
 */
-class thresholdTestFrame : public wxPanel
+class thresholdTestFrame : public wxFrame
 {
  public :
-    thresholdTestFrame(wxWindow* parent);
+    thresholdTestFrame(wxWindow* parent, const wxString& title);
 
     wxPanel             *   m_informPanel;                //  Информация о тестировании
     wxPanel             *   m_filtering_namePanel;        //  Вид фильтрации
@@ -93,13 +93,13 @@ class thresholdTestFrame : public wxPanel
     ZoomSliderCtrl      *   m_zoom_slider_ctrl;
     //  2.
     wxSpinCtrlDouble    *   m_spin_thresh_ctrl;
-    double                  m_thresh            = 1.0;
+    double                  m_thresh            = 127.0;
     //  3.
     wxSpinCtrlDouble    *   m_spin_maxValue_1_ctrl;
-    double                  m_maxValue_1        = 1.0;
+    double                  m_maxValue_1        = 250.0;
     //  4.
     wxSpinCtrlDouble    *   m_spin_maxValue_2_ctrl;
-    double                  m_maxValue_2        = 15.0;
+    double                  m_maxValue_2        = 250.0;
     //  5.
     wxChoice            *   m_choice_threshold_type_1_ctrl;
     int                     m_threshold_type_1  = cv::THRESH_TRUNC;
@@ -111,10 +111,10 @@ class thresholdTestFrame : public wxPanel
     int                     m_adaptiveMethod    = cv::ADAPTIVE_THRESH_GAUSSIAN_C;
     //  8.
     wxSpinCtrl          *   m_spin_blockSize_ctrl;
-    int                     m_blockSize         = 71;
+    int                     m_blockSize         = 21;
     //  9.
     wxSpinCtrlDouble    *   m_spin_Offset_ctrl;
-    double                  m_Offset          = 15.0;      //  Какое-то смещение
+    double                  m_Offset          = -3.0;      //  Какое-то смещение
 
     void OnResize(wxSizeEvent& event);
 

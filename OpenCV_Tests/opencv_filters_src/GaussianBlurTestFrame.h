@@ -50,10 +50,10 @@ using namespace color_output;
     --------------------------------------------------------------------------------------------------------------------
     Класс тестового фрейма для изображений и компонетнов управления
 */
-class GaussianBlurTestFrame : public wxPanel
+class GaussianBlurTestFrame : public wxFrame
 {
  public :
-    GaussianBlurTestFrame(wxWindow* parent);
+    GaussianBlurTestFrame(wxWindow *, const wxString& title);
 
     wxPanel          *  m_informPanel;                //  Панель для вывода информации о тестировании
     wxPanel          *  m_filtering_namePanel;        //  Панель для вывода информации о тестировании
@@ -72,8 +72,8 @@ class GaussianBlurTestFrame : public wxPanel
     wxBitmap            m_filteredBitmap;
 
     wxStaticBitmap *    m_staticPreviewBitmap = nullptr;
-    wxStaticBitmap *    m_staticOriginalBitmap;
-    wxStaticBitmap *    m_staticFilteredBitmap;
+    wxStaticBitmap *    m_staticOriginalBitmap = nullptr;
+    wxStaticBitmap *    m_staticFilteredBitmap = nullptr;
 
 
     cv::Mat             m_cv_original_img;
@@ -100,8 +100,8 @@ class GaussianBlurTestFrame : public wxPanel
 
     void OnZoomSliderChanged(wxCommandEvent& event);
     void OnKernelWidthChanged(wxCommandEvent& event);
-    void OnSigmaXChanged(wxCommandEvent& event);
-    void OnSigmaYChanged(wxCommandEvent& event);
+    void OnSigmaXChanged(wxSpinDoubleEvent& event);
+    void OnSigmaYChanged(wxSpinDoubleEvent& event);
     void OnBorderExtrapolChanged(wxCommandEvent& event);
 
     void UpdateAllViews();

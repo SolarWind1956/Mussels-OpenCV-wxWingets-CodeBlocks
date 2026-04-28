@@ -25,10 +25,13 @@
     V.     	Фильтрация изображения OpenCV
     VI.		Прорисовка изображений OpenCV в формате библиотеки wxVidgets
 */
-GaussianBlurTestFrame::GaussianBlurTestFrame  ( wxWindow  *   parent)
-                                : wxPanel   (   parent          //  Инициализируем как панель
-                                            ,   wxID_ANY
-                                            )
+GaussianBlurTestFrame::GaussianBlurTestFrame  ( wxWindow  *   parent, const wxString& title)
+                        : wxFrame   (   parent
+                                    ,   wxID_ANY
+                                    ,   title
+                                    ,   wxDefaultPosition
+                                    ,   wxSize(800, 600)
+                                    )
 {
     //  I.  ------------------------------------------------------------------------------------------------
     //  Создадим информационную панель,
@@ -191,8 +194,8 @@ GaussianBlurTestFrame::GaussianBlurTestFrame  ( wxWindow  *   parent)
     //  В конструкторе теперь только "регистрация"
     m_zoom_slider_ctrl->Bind(wxEVT_SLIDER, &GaussianBlurTestFrame::OnZoomSliderChanged, this);
     m_kernel_width_ctrl->Bind(EVT_KERNEL_CHANGED, &GaussianBlurTestFrame::OnKernelWidthChanged, this);
-    m_spin_sigmaX_ctrl->Bind(wxEVT_SPINCTRL, &GaussianBlurTestFrame::OnSigmaXChanged, this);
-    m_spin_sigmaY_ctrl->Bind(wxEVT_SPINCTRL, &GaussianBlurTestFrame::OnSigmaYChanged, this);
+    m_spin_sigmaX_ctrl->Bind(wxEVT_SPINCTRLDOUBLE, &GaussianBlurTestFrame::OnSigmaXChanged, this);
+    m_spin_sigmaY_ctrl->Bind(wxEVT_SPINCTRLDOUBLE, &GaussianBlurTestFrame::OnSigmaYChanged, this);
     m_border_chois_ctrl->Bind(wxEVT_CHOICE, &GaussianBlurTestFrame::OnBorderExtrapolChanged, this);
 
     Bind(wxEVT_SIZE, &OnResize, this);
@@ -251,9 +254,9 @@ void GaussianBlurTestFrame::OnKernelWidthChanged(wxCommandEvent& event) {
     Layout();
 }
 
-void GaussianBlurTestFrame::OnSigmaXChanged(wxCommandEvent& event) {
+void GaussianBlurTestFrame::OnSigmaXChanged(wxSpinDoubleEvent& event) {
     // 1. Извлекаем sigmaX
-    m_sigmaX = event.GetInt();
+    m_sigmaX = event.GetValue();
 
     // 3. Запускаем обработку OpenCV
     ApplyFiltering();
@@ -266,9 +269,9 @@ void GaussianBlurTestFrame::OnSigmaXChanged(wxCommandEvent& event) {
     Layout();
 }
 
-void GaussianBlurTestFrame::OnSigmaYChanged(wxCommandEvent& event) {
+void GaussianBlurTestFrame::OnSigmaYChanged(wxSpinDoubleEvent& event) {
     // 1. Извлекаем sigmaY
-    m_sigmaY = event.GetInt();
+    m_sigmaY = event.GetValue();
 
     // 3. Запускаем обработку OpenCV
     ApplyFiltering();
