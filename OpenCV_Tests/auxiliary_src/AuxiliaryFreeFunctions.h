@@ -1,28 +1,19 @@
 //  AuxiliaryFreeFunctions.h
 /*
  **************************************************************
- * Name:      AuxiliaryFreeFunctions.h
- * Purpose:   Code for Application
- * Author:    Sergi E. Heckel (Solar_Wind1956@yahoo.com)
+ * Name:      OpenCV_Tester.cpp
+ * Purpose:   Code for Application Class
+ * Author:    Sergej E. Heckel (Solar_Wind1956@yahoo.com)
  *              with insightful support from Gemini (AI)
  * 	                "Дорогу осилит идущий, а вдвоем идти спорее"
- * Created:   2026-06-21
- * Copyright: Sergi E. Heckel (www.Solar_Wind1956.com)
+ * Created:   2026-04-21
+ * Copyright: Sergej E. Heckel (https://sites.google.com/view/sergej-heckel)
  * License:
  **************************************************************
 */
 #ifndef AUXILIARYFREEFUNCTIONS_H_INCLUDED
 #define AUXILIARYFREEFUNCTIONS_H_INCLUDED
-/*
- **************************************************************
- * Name:      AuxiliaryFreeFunctions.h
- * Purpose:   Code for Application
- * Author:    Sergi E. Heckel (Solar_Wind1956@yahoo.com)
- * Created:   2026-06-21
- * Copyright: Sergi E. Heckel (www.Solar_Wind1956.com)
- * License:
- **************************************************************
-*/
+
 #include <iostream>
 using std::cout; using std::endl; using std::cerr;  using std::boolalpha;
 #include <functional>
@@ -49,10 +40,15 @@ using namespace color_output;
 //  Вспомогательные функции
 /*
     ----------------------------------------------------------------------------------------------------
-    Функция открытия файла изображения
+    Функции открытия файла и получения соответствующей матрицы изображения
 */
-bool getFullFileName(wxString &  fullFileName);
+bool        getFullFileName(wxString &  fullFileName);
+cv::Mat     getOriginalImage();
 
+/*
+    ----------------------------------------------------------------------------------------------------
+    Функция отображения исследуемог изображения в прокруточных окнах
+*/
 void UpdateDisplay  (   wxImage &           wx_img
                     ,   cv::Mat &           mat_image
                     ,   wxBitmap &          bitmap
@@ -61,7 +57,8 @@ void UpdateDisplay  (   wxImage &           wx_img
                     ,   int                 zoom
                     );
 /*
-
+    ----------------------------------------------------------------------------------------------------
+    Функция масштабирования изображения для предварительного просмотра
 */
 // Пример функции для получения масштабированного битмапа
 wxBitmap    GetScaledBitmap(const wxBitmap& original, int targetW, int targetH);

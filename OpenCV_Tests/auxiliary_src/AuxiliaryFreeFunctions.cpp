@@ -3,11 +3,11 @@
  **************************************************************
  * Name:      AuxiliaryFreeFunctions.cpp
  * Purpose:   Code for Application
- * Author:    Sergi E. Heckel (Solar_Wind1956@yahoo.com)
+ * Author:    Sergej E. Heckel (Solar_Wind1956@yahoo.com)
  *              with insightful support from Gemini (AI)
  * 	                "Дорогу осилит идущий, а вдвоем идти спорее"
  * Created:   2026-06-21
- * Copyright: Sergi E. Heckel (www.Solar_Wind1956.com)
+ * Copyright: Sergej E. Heckel (www.Solar_Wind1956.com)
  * License:
  **************************************************************
 */
@@ -15,7 +15,7 @@
 //  Вспомогательные функции
 /*
     ----------------------------------------------------------------------------------------------------
-    Функция открытия файла изображения
+    Функции открытия файла и получения соответствующей матрицы изображения
 */
 bool getFullFileName(wxString &  fullFileName){
     //  Изображение выберем в диалоговом окне
@@ -46,6 +46,45 @@ bool getFullFileName(wxString &  fullFileName){
 
     return  true;
 }
+cv::Mat     getOriginalImage(){
+    cv::Mat original_img = cv::Mat::zeros(400, 400, CV_8UC3);
+
+    // По желанию: рисуем на нем текст, чтобы было понятно, что файл не загружен
+    cv::putText (   original_img
+                ,   "No Image Loaded"
+                ,   cv::Point(50, 200)
+                ,   cv::FONT_HERSHEY_SIMPLEX
+                ,   1.0
+                ,   cv::Scalar(255, 255, 255) // Белый цвет
+                ,   2
+                );
+    //  Выбираем файл с изображением для считывания
+    wxString    fullFileName;               //  Переменная для получения полноо имени файла
+
+    if (!getFullFileName(fullFileName)){
+        cout << bright_red << "Ошибка получения полного имени файла. Завершение работы." << reset << endl;
+    } else {
+        // 	Считываем изображение из файла
+        cv::Mat  temp_RGB_or_BGR = cv::imread(std::string(fullFileName), cv::IMREAD_COLOR);
+
+        #if 0
+        if(tempRGB.empty()){
+            cout << bright_red << std::string(fullFileName) + "Ошибка загрузки изображения. Завершение работы." << reset << endl;
+		} else {
+            cv::cvtColor(tempRGB, original_img, cv::COLOR_BGR2RGB); //
+		}
+		#endif // 0
+
+        if (!temp_RGB_or_BGR.empty()) {
+            cv::cvtColor(temp_RGB_or_BGR, original_img, cv::COLOR_BGR2RGB);
+        };
+	};
+	return original_img.clone();
+}
+/*
+    ----------------------------------------------------------------------------------------------------
+    Функция отображения исследуемог изображения в прокруточных окнах
+*/
 void UpdateDisplay  (   wxImage &           wx_img
                     ,   cv::Mat &           mat_image
                     ,   wxBitmap &          bitmap
@@ -61,8 +100,11 @@ void UpdateDisplay  (   wxImage &           wx_img
                                         );
         wxImage     wx_img_copy =   wx_img.Copy();
 
-        bitmap              = wxBitmap(wx_img_copy.Rescale(mat_image.cols * zoom, mat_image.rows * zoom, wxIMAGE_QUALITY_HIGH));
-        //bitmap              = wxBitmap(wx_img.Copy());
+        bitmap              = wxBitmap(wx_img_copy.Rescale  (   mat_image.cols * zoom
+                                                            ,   mat_image.rows * zoom
+                                                            ,   wxIMAGE_QUALITY_HIGH)
+                                                            );
+
 
         // Важное исправление, о котором я говорил ранее (защита от утечки):
         if (!staticBitmap) {
@@ -78,18 +120,20 @@ void UpdateDisplay  (   wxImage &           wx_img
         scrolled_window->SetScrollbars(10, 10, width / 10, height / 10);
 
         // А вот теперь — финальный аккорд:
+        staticBitmap->Refresh();
+        staticBitmap->Update();
         scrolled_window->Layout();      //  Говорим окну: "Твоё содержимое обновилось, пересчитай размеры"
         scrolled_window->Refresh();     //  Говорим системе: "Перерисуй окно прямо сейчас"
 }
 /*
-
+    ----------------------------------------------------------------------------------------------------
+    Функция масштабирования изображения для предварительного просмотра
 */
-// Пример функции для получения масштабированного битмапа
 wxBitmap    GetScaledBitmap(const wxBitmap& original, int targetW, int targetH)
 {
     wxImage img = original.ConvertToImage();
 
-    // Хитрость №2: Сохранение пропорций
+    //  Хитрость №2: Сохранение пропорций
     double aspect = (double)original.GetWidth() / original.GetHeight();
 
     if (targetW / aspect <= targetH) {
@@ -98,6 +142,6 @@ wxBitmap    GetScaledBitmap(const wxBitmap& original, int targetW, int targetH)
         targetW = targetH * aspect;
     }
 
-    // Используем качественный алгоритм масштабирования (wxIMAGE_QUALITY_HIGH)
+    //  Используем качественный алгоритм масштабирования (wxIMAGE_QUALITY_HIGH)
     return wxBitmap(img.Scale(targetW, targetH, wxIMAGE_QUALITY_HIGH));
 }
