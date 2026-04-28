@@ -50,10 +50,10 @@ using namespace color_output;
     --------------------------------------------------------------------------------------------------------------------
     Класс тестового фрейма для изображений и компонетнов управления
 */
-class resizeTestFrame : public wxPanel
+class resizeTestFrame : public wxFrame
 {
  public :
-    resizeTestFrame(wxWindow* parent);
+    resizeTestFrame(wxWindow* parent, const wxString& title);
 
     wxPanel             *   m_informPanel;                //  Информация о тестировании
     wxPanel             *   m_transforming_namePanel;        //  Вид фильтрации

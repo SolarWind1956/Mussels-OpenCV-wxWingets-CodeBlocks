@@ -25,10 +25,13 @@
     V.     	Фильтрация изображения OpenCV
     VI.		Прорисовка изображений OpenCV в формате библиотеки wxVidgets
 */
-resizeTestFrame::resizeTestFrame  ( wxWindow  *   parent)
-                                                : wxPanel   (   parent          //  Инициализируем как панель
-                                                            ,   wxID_ANY
-                                                            )
+resizeTestFrame::resizeTestFrame  ( wxWindow  *   parent, const wxString& title)
+                        : wxFrame   (   parent
+                                    ,   wxID_ANY
+                                    ,   title
+                                    ,   wxDefaultPosition
+                                    ,   wxSize(800, 600)
+                                    )
 {
     //  I.  ------------------------------------------------------------------------------------------------
     //  Создадим информационную панель,
