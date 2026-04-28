@@ -3,7 +3,9 @@
  * Purpose:   Defines Application Class
  * Author:    Sergi E. Heckel (Solar_Wind1956@yahoo.com)
  * Created:   2026-04-21
- * Copyright: Sergi E. Heckel (www.Solar_Wind1956.com)
+ * Author:    Sergej E. Heckel (Solar_Wind1956@yahoo.com)
+ *              with insightful support from Gemini (AI)
+ * 	                "Дорогу осилит идущий, а вдвоем идти спорее"
  * License:
  **************************************************************/
 
