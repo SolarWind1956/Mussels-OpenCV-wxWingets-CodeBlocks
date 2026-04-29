@@ -45,6 +45,7 @@ using namespace color_output;
 #include "opencv_morphology_src/erodeAfterAdaptiveTestFrame.h"
 
 #include "general_image_transforms/resizeTestFrame.h"
+#include "general_image_transforms/warpAffineTestFrame.h"
 /*
     --------------------------------------------------------------------------------------------------------------------
     Каркассный класс для тестирования библиотеки OpenCV
@@ -79,6 +80,7 @@ class OpenCV_Tester_Window : public wxFrame
 
     //  ---------------------------------------------------------------------------------------------------
     wxMenuItem      *   menu_item_resize;
+    wxMenuItem      *   menu_item_warpAffine;
 
     //  Filters and Convolution   -   Ядра, фильтры и свертки
     BlurTestFrame                       *   m_BlurPage;
@@ -104,8 +106,10 @@ class OpenCV_Tester_Window : public wxFrame
 
     //  General Image Transforms    -   Преобразования изображений общего вида
     resizeTestFrame                     *   m_resizePage;
+    warpAffineTestFrame                 *   m_warpAffinePage;
 
     void On_resize(wxCommandEvent& event);
+    void On_warpAffine(wxCommandEvent& event);
 };
 
 #endif  // OpenCV_Tester_Window_H_INCLUDED

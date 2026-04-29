@@ -88,6 +88,14 @@ OpenCV_Tester_Window::OpenCV_Tester_Window  (const wxString &   title)
     menu_GeneralTransforms->Append(menu_item_resize);
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &OpenCV_Tester_Window::On_resize, this, menu_item_resize->GetId());
 
+    menu_item_warpAffine  =   new wxMenuItem  (menu_GeneralTransforms,   wxID_ANY,   wxT("warpAffine"));
+    menu_GeneralTransforms->Append(menu_item_warpAffine);
+    this->Bind  (   wxEVT_COMMAND_MENU_SELECTED
+                ,   &OpenCV_Tester_Window::On_warpAffine
+                ,   this
+                ,   menu_item_warpAffine->GetId()
+                );
+
     m_frame_panel = new wxPanel(this);
 
     // ВАЖНО: Главный сайзер для ФРЕЙМА, чтобы панель занимала всё место
@@ -104,7 +112,6 @@ void OpenCV_Tester_Window::On_Blur(wxCommandEvent& event){
     // 1. Просто создаем объект окна
     // Указываем 'this' как родителя, чтобы окно не терялось
     BlurTestFrame * m_BlurPage = new BlurTestFrame(this, wxT("Фильтр размытия (Blur)"));
-
     // 2. Показываем его
     m_BlurPage->Show(true);
 }
@@ -112,7 +119,6 @@ void OpenCV_Tester_Window::On_medianBlur(wxCommandEvent& event){
     // 1. Просто создаем объект окна
     // Указываем 'this' как родителя, чтобы окно не терялось
     medianBlurTestFrame * m_medianBlurPage = new medianBlurTestFrame(this, wxT("Фильтр размытия (medianBlur)"));
-
     // 2. Показываем его
     m_medianBlurPage->Show(true);
 }
@@ -120,7 +126,6 @@ void OpenCV_Tester_Window::On_GaussianBlur(wxCommandEvent& event){
     // 1. Просто создаем объект окна
     // Указываем 'this' как родителя, чтобы окно не терялось
     GaussianBlurTestFrame * m_GaussianBlurPage = new GaussianBlurTestFrame(this, wxT("Фильтр размытия (GaussianBlur)"));
-
     // 2. Показываем его
     m_GaussianBlurPage->Show(true);
 }
@@ -128,7 +133,6 @@ void OpenCV_Tester_Window::On_threshold(wxCommandEvent& event){
 // 1. Просто создаем объект окна
     // Указываем 'this' как родителя, чтобы окно не терялось
     thresholdTestFrame * m_thresholdPage = new thresholdTestFrame(this, wxT("Глобальный пороговый фильтр (threshold)"));
-
     // 2. Показываем его
     m_thresholdPage->Show(true);
 }
@@ -137,16 +141,14 @@ void OpenCV_Tester_Window::On_threshold(wxCommandEvent& event){
 void OpenCV_Tester_Window::On_erode(wxCommandEvent& event){
 // 1. Просто создаем объект окна
     // Указываем 'this' как родителя, чтобы окно не терялось
-    erodeTestFrame * m_erodePage = new erodeTestFrame(this, wxT("Трансформация сжатия (erode)"));
-
+    erodeTestFrame * m_erodePage = new erodeTestFrame(this, wxT("Трансформация эрозии (erode)"));
     // 2. Показываем его
     m_erodePage->Show(true);
 }
 void OpenCV_Tester_Window::On_dilate(wxCommandEvent& event){
     // 1. Просто создаем объект окна
     // Указываем 'this' как родителя, чтобы окно не терялось
-    dilateTestFrame * m_dilatePage = new dilateTestFrame(this, wxT("Трансформация расширения (dilate)"));
-
+    dilateTestFrame * m_dilatePage = new dilateTestFrame(this, wxT("Трансформация наращивания (dilate)"));
     // 2. Показываем его
     m_dilatePage->Show(true);
 }
@@ -155,7 +157,6 @@ void OpenCV_Tester_Window::On_erodeAfterThreshold(wxCommandEvent& event){
     // Указываем 'this' как родителя, чтобы окно не терялось
     erodeAfterThresholdTestFrame * m_erodeAfterThresholdPage =
         new erodeAfterThresholdTestFrame(this,   wxT("Трансформация erode после глобального порогового фильтра"));
-
     // 2. Показываем его
     m_erodeAfterThresholdPage->Show(true);
 }
@@ -164,7 +165,6 @@ void OpenCV_Tester_Window::On_erodeAfterAdaptive(wxCommandEvent& event){
     // Указываем 'this' как родителя, чтобы окно не терялось
     erodeAfterAdaptiveTestFrame * m_erodeAfterAdaptivePage =
                     new erodeAfterAdaptiveTestFrame(this, wxT("Трансформация erode после адаптива"));
-
     // 2. Показываем его
     m_erodeAfterAdaptivePage->Show(true);
 }
@@ -175,7 +175,15 @@ void OpenCV_Tester_Window::On_resize(wxCommandEvent& event){
     // Указываем 'this' как родителя, чтобы окно не терялось
     resizeTestFrame * m_resizePage =
                             new resizeTestFrame(this, wxT("Преобразование размера изображения (resize)"));
-
     // 2. Показываем его
     m_resizePage->Show(true);
 }
+void OpenCV_Tester_Window::On_warpAffine(wxCommandEvent& event){
+    // 1. Просто создаем объект окна
+    // Указываем 'this' как родителя, чтобы окно не терялось
+    warpAffineTestFrame * m_warpAffinePage =
+                            new warpAffineTestFrame(this, wxT("Плотные афинные преобразования - сдвиг (warpAffine)"));
+    // 2. Показываем его
+    m_warpAffinePage->Show(true);
+}
+
