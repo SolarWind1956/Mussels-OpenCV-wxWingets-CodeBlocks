@@ -95,7 +95,13 @@ OpenCV_Tester_Window::OpenCV_Tester_Window  (const wxString &   title)
                 ,   this
                 ,   menu_item_warpAffine->GetId()
                 );
-
+    menu_item_warpPerspective  =   new wxMenuItem  (menu_GeneralTransforms,   wxID_ANY,   wxT("warpPerspective"));
+    menu_GeneralTransforms->Append(menu_item_warpPerspective);
+    this->Bind  (   wxEVT_COMMAND_MENU_SELECTED
+                ,   &OpenCV_Tester_Window::On_warpPerspective
+                ,   this
+                ,   menu_item_warpPerspective->GetId()
+                );
     m_frame_panel = new wxPanel(this);
 
     // ВАЖНО: Главный сайзер для ФРЕЙМА, чтобы панель занимала всё место
@@ -182,8 +188,15 @@ void OpenCV_Tester_Window::On_warpAffine(wxCommandEvent& event){
     // 1. Просто создаем объект окна
     // Указываем 'this' как родителя, чтобы окно не терялось
     warpAffineTestFrame * m_warpAffinePage =
-                            new warpAffineTestFrame(this, wxT("Плотные афинные преобразования - сдвиг (warpAffine)"));
+                new warpAffineTestFrame(this, wxT("Плотные афинные преобразования - сдвиг (warpAffine)"));
     // 2. Показываем его
     m_warpAffinePage->Show(true);
 }
-
+void OpenCV_Tester_Window::On_warpPerspective(wxCommandEvent& event){
+    // 1. Просто создаем объект окна
+    // Указываем 'this' как родителя, чтобы окно не терялось
+    warpPerspectiveTestFrame * m_warpPerspectivePage =
+                 new warpPerspectiveTestFrame(this, wxT("Плотные перспективные преобразования (warpPerspective)"));
+    // 2. Показываем его
+    m_warpPerspectivePage->Show(true);
+}

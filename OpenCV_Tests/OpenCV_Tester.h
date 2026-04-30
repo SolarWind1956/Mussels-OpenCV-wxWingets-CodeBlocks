@@ -46,6 +46,7 @@ using namespace color_output;
 
 #include "general_image_transforms/resizeTestFrame.h"
 #include "general_image_transforms/warpAffineTestFrame.h"
+#include "general_image_transforms/warpPerspectiveTestFrame.h"
 /*
     --------------------------------------------------------------------------------------------------------------------
     Каркассный класс для тестирования библиотеки OpenCV
@@ -81,6 +82,7 @@ class OpenCV_Tester_Window : public wxFrame
     //  ---------------------------------------------------------------------------------------------------
     wxMenuItem      *   menu_item_resize;
     wxMenuItem      *   menu_item_warpAffine;
+    wxMenuItem      *   menu_item_warpPerspective;
 
     //  Filters and Convolution   -   Ядра, фильтры и свертки
     BlurTestFrame                       *   m_BlurPage;
@@ -107,9 +109,11 @@ class OpenCV_Tester_Window : public wxFrame
     //  General Image Transforms    -   Преобразования изображений общего вида
     resizeTestFrame                     *   m_resizePage;
     warpAffineTestFrame                 *   m_warpAffinePage;
+    warpPerspectiveTestFrame            *   m_warpPerspectivePage;
 
     void On_resize(wxCommandEvent& event);
     void On_warpAffine(wxCommandEvent& event);
+    void On_warpPerspective(wxCommandEvent& event);
 };
 
 #endif  // OpenCV_Tester_Window_H_INCLUDED
