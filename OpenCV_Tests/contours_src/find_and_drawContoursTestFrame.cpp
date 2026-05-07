@@ -130,7 +130,7 @@ find_and_drawContoursTestFrame::find_and_drawContoursTestFrame  ( wxWindow  *   
     m_borderType_chois_ctrl =   new wxChoice     (   this
                                                  ,   wxID_ANY
                                                  ,   wxDefaultPosition
-                                                 ,   wxSize(180, -1)
+                                                 ,   wxSize(150, -1)
                                                  ,   WXSIZEOF(borderTypes)
                                                  ,   borderTypes
                                                  ,   0
@@ -140,11 +140,11 @@ find_and_drawContoursTestFrame::find_and_drawContoursTestFrame  ( wxWindow  *   
     //  7.  Пороговое значение глобального порогового фильтра
     m_thresh_sldr_ctrl      =   new     wxSlider   (   this
                                                     ,   wxID_ANY
-                                                    ,   100              //  Начальное значение
-                                                    ,   1              //  Минимальное значение
-                                                    ,   255              //  Максимальное значение
+                                                    ,   100                 //  Начальное значение
+                                                    ,   1                   //  Минимальное значение
+                                                    ,   255                 //  Максимальное значение
                                                     ,   wxPoint(1, 1)
-                                                    ,   wxSize(150, -1)   //  Горизонтальный слайдер
+                                                    ,   wxSize(150, -1)     //  Горизонтальный слайдер
                                                     ,   wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS
                                                     );
 
@@ -158,7 +158,7 @@ find_and_drawContoursTestFrame::find_and_drawContoursTestFrame  ( wxWindow  *   
     m_threshold_type_choice_ctrl     =   new wxChoice      (   this
                                                            ,   wxID_ANY
                                                            ,   wxDefaultPosition
-                                                           ,   wxSize(180, -1)
+                                                           ,   wxSize(150, -1)
                                                            ,   WXSIZEOF(thresholdTypes)
                                                            ,   thresholdTypes
                                                            ,   0
@@ -167,15 +167,15 @@ find_and_drawContoursTestFrame::find_and_drawContoursTestFrame  ( wxWindow  *   
 
     //  9.  Режим возврата контуров
     wxString    contour_return_mode[] =
-                                    {   wxT("cv::RETR_EXTERNAL")        //
-                                    ,   wxT("cv::RETR_LIST")    //
-                                    ,   wxT("cv::RETR_CCOMP")         //
-                                    ,   wxT("cv::RETR_TREE")        //
+                                    {   wxT("cv::RETR_EXTERNAL")
+                                    ,   wxT("cv::RETR_LIST")
+                                    ,   wxT("cv::RETR_CCOMP")
+                                    ,   wxT("cv::RETR_TREE")
                                     };
     m_contour_return_mode_choice_ctrl   = new wxChoice (   this
                                                        ,   wxID_ANY
                                                        ,   wxDefaultPosition
-                                                       ,   wxSize(180, -1)
+                                                       ,   wxSize(120, -1)
                                                        ,   WXSIZEOF(contour_return_mode)
                                                        ,   contour_return_mode
                                                        ,   0
@@ -184,10 +184,10 @@ find_and_drawContoursTestFrame::find_and_drawContoursTestFrame  ( wxWindow  *   
 
     //  10. Метод апроксимации при поиске контуров
     wxString    approximation_method[] =
-                                    {   wxT("cv::CHAIN_APPROX_NONE")        //
-                                    ,   wxT("cv::CHAIN_APPROX_SIMPLE")    //
-                                    ,   wxT("cv::CHAIN_APPROX_TC89_L1")         //
-                                    ,   wxT("cv::CHAIN_APPROX_TC89_KCOS")        //
+                                    {   wxT("cv::CHAIN_APPROX_NONE")
+                                    ,   wxT("cv::CHAIN_APPROX_SIMPLE")
+                                    ,   wxT("cv::CHAIN_APPROX_TC89_L1")
+                                    ,   wxT("cv::CHAIN_APPROX_TC89_KCOS")
                                     };
     m_approximation_method_choice_ctrl     = new wxChoice  (   this
                                                            ,   wxID_ANY
@@ -208,6 +208,17 @@ find_and_drawContoursTestFrame::find_and_drawContoursTestFrame  ( wxWindow  *   
                                                 ,   wxSP_ARROW_KEYS
                                                 ,   1        // Минимум:
                                                 ,   5        // Максимум:
+                                                ,   1        // Текущее значение
+                                                );
+    //  12. Максимальный уровень иерархии
+    m_maxLevel_spin_ctrl    =   new wxSpinCtrl (   this
+                                                ,   wxID_ANY
+                                                ,   wxEmptyString
+                                                ,   wxDefaultPosition
+                                                ,   wxDefaultSize
+                                                ,   wxSP_ARROW_KEYS
+                                                ,   1        // Минимум:
+                                                ,   15       // Максимум:
                                                 ,   1        // Текущее значение
                                                 );
 
@@ -267,15 +278,13 @@ find_and_drawContoursTestFrame::find_and_drawContoursTestFrame  ( wxWindow  *   
     controlPanelHSizer->Add(kernelHor, 0, wxEXPAND | wxALL, 5);
 
     //  4. и 5.  Сигмы распределения Гауссиана
-    wxBoxSizer*         sigmaX_Col       = new wxBoxSizer(wxVERTICAL);
-    sigmaX_Col->Add(new wxStaticText(this, -1, "sigmaX"), 0, wxALL, 5);
-    sigmaX_Col->Add(m_sigmaX_spin_ctrl, 0, wxALL, 5);
-    controlPanelHSizer->Add(sigmaX_Col, 0, wxEXPAND | wxALL, 5);
+    wxBoxSizer*         sigmas_Col       = new wxBoxSizer(wxVERTICAL);
+    sigmas_Col->Add(new wxStaticText(this, -1, "sigmaX"), 0, wxALL, 5);
+    sigmas_Col->Add(m_sigmaX_spin_ctrl, 0, wxALL, 5);
 
-    wxBoxSizer*         sigmaY_Col       = new wxBoxSizer(wxVERTICAL);
-    sigmaY_Col->Add(new wxStaticText(this, -1, "sigmaY"), 0, wxALL, 5);
-    sigmaY_Col->Add(m_sigmaY_spin_ctrl, 0, wxALL, 5);
-    controlPanelHSizer->Add(sigmaY_Col, 0, wxEXPAND | wxALL, 5);
+    sigmas_Col->Add(new wxStaticText(this, -1, "sigmaY"), 0, wxALL, 5);
+    sigmas_Col->Add(m_sigmaY_spin_ctrl, 0, wxALL, 5);
+    controlPanelHSizer->Add(sigmas_Col, 0, wxEXPAND | wxALL, 5);
 
     //  6.  Тип экстраполяции границ Гауссиана (borderType)
     wxBoxSizer*         typeBodersCol       = new wxBoxSizer(wxVERTICAL);
@@ -285,7 +294,7 @@ find_and_drawContoursTestFrame::find_and_drawContoursTestFrame  ( wxWindow  *   
 
     //  7.  Пороговое значение глобального порогового фильтра
     wxBoxSizer*         thresholdCol         = new wxBoxSizer(wxVERTICAL);
-    thresholdCol->Add(new wxStaticText(this, -1, "Порог для threshold"), 0, wxALL, 5);
+    thresholdCol->Add(new wxStaticText(this, -1, "Порог для Threshold"), 0, wxALL, 5);
     thresholdCol->Add(m_thresh_sldr_ctrl, 0, wxALL, 5);
     controlPanelHSizer->Add(thresholdCol, 0, wxEXPAND | wxALL, 5);
 
@@ -297,21 +306,27 @@ find_and_drawContoursTestFrame::find_and_drawContoursTestFrame  ( wxWindow  *   
 
     //  9.  Режим возврата контуров
     wxBoxSizer*         contour_return_mode_Col       = new wxBoxSizer(wxVERTICAL);
-    contour_return_mode_Col->Add(new wxStaticText(this, -1, "Режим возврата контуров"), 0, wxALL, 5);
+    contour_return_mode_Col->Add(new wxStaticText(this, -1, "Режим \nвозврата контуров"), 0, wxALL, 5);
     contour_return_mode_Col->Add(m_contour_return_mode_choice_ctrl, 0, wxALL, 5);
     controlPanelHSizer->Add(contour_return_mode_Col, 0, wxEXPAND | wxALL, 5);
 
     //  10. Метод апроксимации при поиске контуров
     wxBoxSizer*         approximation_method_Col       = new wxBoxSizer(wxVERTICAL);
-    approximation_method_Col->Add(new wxStaticText(this, -1, "Режим возврата контуров"), 0, wxALL, 5);
+    approximation_method_Col->Add(new wxStaticText(this, -1, "Метод аппроксимации"), 0, wxALL, 5);
     approximation_method_Col->Add(m_approximation_method_choice_ctrl, 0, wxALL, 5);
     controlPanelHSizer->Add(approximation_method_Col, 0, wxEXPAND | wxALL, 5);
 
     //  11. Толщина линии прорисовки контуров
     wxBoxSizer*         thickness_Col       = new wxBoxSizer(wxVERTICAL);
-    thickness_Col->Add(new wxStaticText(this, -1, "Толщина линии "), 0, wxALL, 5);
+    thickness_Col->Add(new wxStaticText(this, -1, "Толщина \nлинии"), 0, wxALL, 5);
     thickness_Col->Add(m_thickness_spin_ctrl, 0, wxALL, 5);
     controlPanelHSizer->Add(thickness_Col, 0, wxEXPAND | wxALL, 5);
+
+    //  12. Максимальный уровень иерархии
+    wxBoxSizer*         maxLevel_Col       = new wxBoxSizer(wxVERTICAL);
+    maxLevel_Col->Add(new wxStaticText(this, -1, "Максимальный \nуровень \nиерархии"), 0, wxALL, 5);
+    maxLevel_Col->Add(m_maxLevel_spin_ctrl, 0, wxALL, 5);
+    controlPanelHSizer->Add(maxLevel_Col, 0, wxEXPAND | wxALL, 5);
 
     //  -------------------------------------------------------------------------------------------------
 
@@ -325,21 +340,11 @@ find_and_drawContoursTestFrame::find_and_drawContoursTestFrame  ( wxWindow  *   
 
     this->SetSizer(mainSizer);
     //  ----------------------------------------------------------------------------------------------------------
-    //  Именно после настройки сайзеров можно установить начальные значения на спин-контролах ширины и высоты
-    //  окна преобразованного изображения, только я пока не заню, как
-    // Получаем текущий размер окна для трансформированного изображения
-    // 1. Принудительно заставляем сайзер родительского окна (или панели) рассчитать размеры
+    //  Принудительно заставляем сайзер родительского окна (или панели) рассчитать размеры
     this->Layout();
 
-    // 2. Спрашиваем размер клиентской области (без рамок и заголовков)
-    #if 0
-    wxSize dstSize = m_scrolled_wind_transformed->GetClientSize();
-    m_kernel_width_ctrl->SetValue(dstSize.x);
-    m_spin_newHeight_ctrl->SetValue(dstSize.y);
-    #endif
     //  III.     ------------------------------------------------------------------------------------------------
     //  Привязка обработчиков событий
-    //  В конструкторе теперь только "регистрация"
     //  1.
     m_zoom_orig_slider_ctrl->Bind(wxEVT_SLIDER, &find_and_drawContoursTestFrame::On_zoomOrigSliderChanged, this);
     //  2.
@@ -370,6 +375,10 @@ find_and_drawContoursTestFrame::find_and_drawContoursTestFrame  ( wxWindow  *   
     m_thickness_spin_ctrl->Bind(wxEVT_SPINCTRL,
                                         &find_and_drawContoursTestFrame::On_thicknessChanged, this);
 
+    // 12.
+    m_maxLevel_spin_ctrl->Bind(wxEVT_SPINCTRL,
+                                        &find_and_drawContoursTestFrame::On_maxLevelChanged, this);
+
     Bind(wxEVT_SIZE, &OnResize, this);
 
     //  IV. -----------------------------------------------------------------------------------------------------
@@ -379,7 +388,6 @@ find_and_drawContoursTestFrame::find_and_drawContoursTestFrame  ( wxWindow  *   
     //  Готовим полутоновое изображение
     cv::cvtColor(m_cv_original_img, gray, cv::COLOR_BGR2GRAY);
 
-    //binary = cv::Mat::zeros(gray.size(), CV_8U);
 	//  V. --------------------------------------------------------------------------------------------------------------------
     //  Морфологическая трансформация оригинального изображения OpenCV
     ApplyTransformation();
@@ -408,18 +416,18 @@ void find_and_drawContoursTestFrame::OnResize(wxSizeEvent& event)
 }
 //  1.
 void find_and_drawContoursTestFrame::On_zoomOrigSliderChanged(wxCommandEvent& event) {
-    // 1. Извлекаем масшаб
+
     m_zoom_orig_slider_ctrl->m_zoom = event.GetInt();
-    // 2. Запускаем обработку OpenCV
+
     UpdateAllViews();
 
     Layout();
 }
 //  2.
 void find_and_drawContoursTestFrame::On_zoomTransfSliderChanged(wxCommandEvent& event) {
-    // 1. Извлекаем масшаб
+
     m_zoom_transf_slider_ctrl->m_zoom = event.GetInt();
-    // 2. Запускаем обработку OpenCV
+
     UpdateAllViews();
 
     Layout();
@@ -430,13 +438,11 @@ void find_and_drawContoursTestFrame::On_kernel_widthChanged(wxCommandEvent& even
     #if 0
     MessageBoxW(NULL, L"Работает", L"On_kernel_widthChanged()", MB_OK | MB_ICONINFORMATION);
     #endif
-    // 1. Извлекаем новую ширину
+
     m_kernel_width = event.GetInt();
 
-    // 2. Запускаем обработку OpenCV
     ApplyTransformation();
 
-    // 3. Обновляем картинки
     UpdateAllViews();
 
     Layout();
@@ -448,10 +454,8 @@ void find_and_drawContoursTestFrame::On_sigmaXChanged(wxSpinDoubleEvent& event) 
     #endif
     m_sigmaX = event.GetValue();
 
-    // 2. Запускаем обработку OpenCV
     ApplyTransformation();
 
-    // 3. Обновляем картинки
     UpdateAllViews();
 
     Layout();
@@ -466,10 +470,9 @@ void find_and_drawContoursTestFrame::On_sigmaYChanged(wxSpinDoubleEvent& event) 
     std::wstring msg = L"\nm_sigmaY: " + std::to_wstring(m_sigmaY);
     m_debugInfo->AppendText(msg);
     #endif
-    // 2. Запускаем обработку OpenCV
+
     ApplyTransformation();
 
-    // 3. Обновляем картинки
     UpdateAllViews();
 
     Layout();
@@ -484,10 +487,9 @@ void find_and_drawContoursTestFrame::On_borderTypeChanged(wxCommandEvent& event)
     std::wstring msg = L"\n: " + std::to_wstring(m_borderType);
     m_debugInfo->AppendText(msg);
     #endif
-    // 2. Запускаем обработку OpenCV
+
     ApplyTransformation();
 
-    // 3. Обновляем картинки
     UpdateAllViews();
 
     Layout();
@@ -502,10 +504,9 @@ void find_and_drawContoursTestFrame::On_threshChanged(wxCommandEvent& event) {
     std::wstring msg = L"\nКоэффициент X нижнего левого угла: " + std::to_wstring(m_thresh);
     m_debugInfo->AppendText(msg);
     #endif
-    // 2. Запускаем обработку OpenCV
+
     ApplyTransformation();
 
-    // 3. Обновляем картинки
     UpdateAllViews();
 
     Layout();
@@ -520,10 +521,9 @@ void find_and_drawContoursTestFrame::On_threshold_typeChanged(wxCommandEvent& ev
     std::wstring msg = L"\n: " + std::to_wstring(m_threshold_type);
     m_debugInfo->AppendText(msg);
     #endif
-    // 2. Запускаем обработку OpenCV
+
     ApplyTransformation();
 
-    // 3. Обновляем картинки
     UpdateAllViews();
 
     Layout();
@@ -538,10 +538,9 @@ void find_and_drawContoursTestFrame::On_contour_return_modeChanged(wxCommandEven
     std::wstring msg = L"\n: " + std::to_wstring(m_contour_return_mode);
     m_debugInfo->AppendText(msg);
     #endif
-    // 2. Запускаем обработку OpenCV
+
     ApplyTransformation();
 
-    // 3. Обновляем картинки
     UpdateAllViews();
 
     Layout();
@@ -557,10 +556,9 @@ void find_and_drawContoursTestFrame::On_approximation_methodChanged(wxCommandEve
     std::wstring msg = L"\n: " + std::to_wstring(m_approximation_method);
     m_debugInfo->AppendText(msg);
     #endif
-    // 2. Запускаем обработку OpenCV
+
     ApplyTransformation();
 
-    // 3. Обновляем картинки
     UpdateAllViews();
 
     Layout();
@@ -574,23 +572,32 @@ void find_and_drawContoursTestFrame::On_thicknessChanged(wxSpinEvent& event) {
     m_debugInfo->AppendText(msg);
     #endif
 
-    // 2. Запускаем обработку OpenCV
     ApplyTransformation();
 
-    // 3. Обновляем картинки
     UpdateAllViews();
 
     Layout();
 }
-//  10.
+//  12.
+void find_and_drawContoursTestFrame::On_maxLevelChanged(wxSpinEvent& event) {
+    // 1. Обновляем переменную типа границы
+    m_maxLevel  =   event.GetInt();
+    #if 1
+    std::wstring msg = L"\nМаксимальный уровень иерархии: " + std::to_wstring(m_maxLevel);
+    m_debugInfo->AppendText(msg);
+    #endif
+
+    ApplyTransformation();
+
+    UpdateAllViews();
+
+    Layout();
+}
 // Универсальная функция, которая знает про оба окна
 void find_and_drawContoursTestFrame::UpdateAllViews() {
     #if 0
     MessageBoxW(NULL, L"Работает before m_cv_original_img", L"UpdateAllViews()", MB_OK | MB_ICONINFORMATION);
     #endif
-    //  Визуализация оригинального, отфильтрованного и трансформированного изображений
-
-    //  Преобразования для вывода оригинального изображения OpenCV в формате библиотеки wxVidgets
     //  ---------------------------------------------------------------------------------------------------------
     //  Вывод оригинального изображения - оно может быть и трехканальным и одноканалным, лишь бы не бинарным
     UpdateDisplay   (   m_wx_img
@@ -606,11 +613,10 @@ void find_and_drawContoursTestFrame::UpdateAllViews() {
     #if 0
     MessageBoxW(NULL, L"Работает before bitwise_and", L"UpdateAllViews()", MB_OK | MB_ICONINFORMATION);
     #endif
-    //cv::cvtColor(m_cv_original_img, gray, cv::COLOR_BGR2GRAY);
+
     gray_tmp = binary.clone();
     cv::cvtColor(gray_tmp, m_cv_transformed_img, cv::COLOR_GRAY2BGR);
-    //cv::bitwise_and(m_cv_original_img, binary, m_cv_transformed_img); // , binary
-    //cv::bitwise_and(m_cv_original_img, m_cv_original_img, m_image_for_transform, m_cv_filtered_img);
+
     #if 0
     MessageBoxW(NULL, L"Работает before m_cv_transformed_img", L"UpdateAllViews()", MB_OK | MB_ICONINFORMATION);
     #endif
@@ -652,9 +658,11 @@ void find_and_drawContoursTestFrame::ApplyTransformation() {
 	#if 0
     MessageBoxW(NULL, L"Работает before cv::findContours", L"ApplyTransformation()", MB_OK | MB_ICONINFORMATION);
     #endif
+    std::vector<cv::Vec4i> 				hierarchy;
+
 	cv::findContours	(	binary
                         ,	contours
-                        ,	cv::noArray()
+                        ,	hierarchy               //  информация о топологии
                         ,	m_contour_return_mode
                         ,	m_approximation_method
                         );
@@ -664,11 +672,17 @@ void find_and_drawContoursTestFrame::ApplyTransformation() {
 	#if 0
     MessageBoxW(NULL, L"Работает before cv::drawContours", L"ApplyTransformation()", MB_OK | MB_ICONINFORMATION);
     #endif
+
+    int         		lineType 			= 8;           	// 	связность ('4' или '8')
+
 	cv::drawContours	( 	binary          //  Контуры рисуются на входном изображении
                         , 	contours
                         , 	-1
                         , 	cv::Scalar::all(255)
                         ,   m_thickness
+                        ,   lineType
+                        ,   hierarchy               //  информация о топологии
+                        ,   m_maxLevel
                         );
     #if 0
     MessageBoxW(NULL, L"Работает after cv::drawContours", L"ApplyTransformation()", MB_OK | MB_ICONINFORMATION);

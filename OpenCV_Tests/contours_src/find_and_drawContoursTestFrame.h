@@ -136,6 +136,10 @@ class find_and_drawContoursTestFrame : public wxFrame
     wxSpinCtrl          *   m_thickness_spin_ctrl;
     int                     m_thickness                 = 1;
 
+    //  12.  Максимальный уровень иерархии maxLevel
+    wxSpinCtrl          *   m_maxLevel_spin_ctrl;
+    int                     m_maxLevel                  = 1;
+
     void OnResize(wxSizeEvent& event);
 
     //  1.
@@ -160,8 +164,11 @@ class find_and_drawContoursTestFrame : public wxFrame
     void On_approximation_methodChanged(wxCommandEvent& event);
     //  11.
     void On_thicknessChanged(wxSpinEvent& event);
+    //  12.
+    void On_maxLevelChanged(wxSpinEvent& event);
 
     void UpdateAllViews();
+
  private:
     void            ApplyTransformation();
     std::string     getSignatureText();
